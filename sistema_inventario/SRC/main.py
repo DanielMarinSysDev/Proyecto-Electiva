@@ -1,5 +1,5 @@
 from gestor_datos import GestorDatos
-from sistema_inventario.SRC.auth import autenticar_usuario, registrar_usuario_nuevo
+from auth import autenticar_usuario, registrar_usuario_nuevo
 import os
 
 def limpiar_pantalla():
