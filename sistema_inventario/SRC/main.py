@@ -1,29 +1,64 @@
 from gestor_datos import GestorDatos
+from sistema_inventario.SRC.auth import autenticar_usuario, registrar_usuario_nuevo
+import os
+
+def limpiar_pantalla():
+    # Detecta si es Windows ('nt') o Linux/Mac ('posix')
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def menu_principal(usuario_actual):
+    """
+    El bucle principal del programa una vez logueado.
+    """
+    while True:
+        print("\n" + "="*30)
+        print(f" SISTEMA DE INVENTARIO - Usuario: {usuario_actual['username']} ({usuario_actual['rol']})")
+        print("="*30)
+        print("1. Gestión de Inventario (Próximamente)")
+        print("2. Reportes (Próximamente)")
+        
+        # Solo mostramos opción de crear usuarios si es admin
+        if usuario_actual['rol'] == 'admin':
+            print("3. Administración de Usuarios")
+            
+        print("0. Salir")
+        
+        opcion = input("\nSeleccione una opción: ")
+        
+        if opcion == "1":
+            print(">> Módulo de inventario en construcción...")
+        elif opcion == "2":
+            print(">> Módulo de reportes en construcción...")
+        elif opcion == "3" and usuario_actual['rol'] == 'admin':
+            registrar_usuario_nuevo()
+        elif opcion == "0":
+            print("Saliendo...")
+            break
+        else:
+            print("Opción no válida.")
 
 def inicializar_sistema():
-    # 1. Conectamos con el archivo de usuarios
-    db_usuarios = GestorDatos("usuarios.json")
+    # 1. Aseguramos que existan datos básicos
+    db = GestorDatos("usuarios.json")
+    if not db.leer_datos():
+        print("Creando usuario admin por defecto...")
+        db.guardar_datos([{"id": 1, "username": "admin", "password": "123", "rol": "admin"}])
+
+    # 2. Bucle de Login
+    intentos = 0
+    usuario_logueado = None
     
-    # 2. Leemos qué usuarios existen
-    usuarios = db_usuarios.leer_datos()
+    while intentos < 3 and usuario_logueado is None:
+        usuario_logueado = autenticar_usuario()
+        if usuario_logueado:
+            limpiar_pantalla()
+            menu_principal(usuario_logueado)
+        else:
+            intentos += 1
+            print(f"Intentos restantes: {3 - intentos}")
     
-    # 3. Lógica: Si no hay usuarios, creamos el Admin por defecto
-    if not usuarios:
-        print("--- Configuración Inicial ---")
-        print("No se encontraron usuarios. Creando Administrador...")
-        
-        admin_user = {
-            "id": 1,
-            "username": "admin",
-            "password": "123",  # En un sistema real esto iría encriptado
-            "rol": "admin"
-        }
-        
-        usuarios.append(admin_user)
-        db_usuarios.guardar_datos(usuarios)
-        print("¡Usuario Admin creado con éxito!")
-    else:
-        print(f"Sistema cargado. Se encontraron {len(usuarios)} usuarios.")
+    if not usuario_logueado:
+        print("Demasiados intentos fallidos. Sistema bloqueado.")
 
 if __name__ == "__main__":
     inicializar_sistema()
