@@ -1,6 +1,9 @@
 from gestor_datos import GestorDatos
 from auth import autenticar_usuario, registrar_usuario_nuevo
 import os
+from inventory import menu_inventario
+from reports import menu_reportes
+from admin_users import menu_usuarios
 
 def limpiar_pantalla():
     # Detecta si es Windows ('nt') o Linux/Mac ('posix')
@@ -26,11 +29,11 @@ def menu_principal(usuario_actual):
         opcion = input("\nSeleccione una opción: ")
         
         if opcion == "1":
-            print(">> Módulo de inventario en construcción...")
+            menu_inventario()
         elif opcion == "2":
-            print(">> Módulo de reportes en construcción...")
+            menu_reportes()  # <-- Conectamos el módulo nuevo
         elif opcion == "3" and usuario_actual['rol'] == 'admin':
-            registrar_usuario_nuevo()
+            menu_usuarios(usuario_actual)
         elif opcion == "0":
             print("Saliendo...")
             break
