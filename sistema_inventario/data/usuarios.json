@@ -4,5 +4,11 @@
         "username": "admin",
         "password": "123",
         "rol": "admin"
+    },
+    {
+        "id": 2,
+        "username": "Daniel",
+        "password": "123",
+        "rol": "user"
     }
 ]
