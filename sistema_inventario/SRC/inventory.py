@@ -1,5 +1,6 @@
 from gestor_datos import GestorDatos
 import os
+from logger import registrar_accion  # <--- NUEVO
 
 def limpiar_pantalla():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -37,6 +38,64 @@ def menu_inventario():
         else:
             input("Opción no válida. Enter para continuar...")
 
+def registrar_movimiento(db):
+    productos = db.leer_datos()
+    print("\n--- REGISTRAR MOVIMIENTO DE STOCK ---")
+    sku_buscar = input("SKU del producto: ").strip().upper()
+    
+    # ... (Búsqueda del producto igual que antes) ...
+    producto = None
+    indice = -1
+    for i, p in enumerate(productos):
+        if p['sku'] == sku_buscar:
+            producto = p
+            indice = i
+            break
+    
+    if not producto:
+        print("Producto no encontrado.")
+        input("Enter para continuar...")
+        return
+
+    # ... (Pedir tipo y cantidad igual que antes) ...
+    print(f"Producto: {producto['nombre']} | Stock actual: {producto['cantidad']}")
+    print("1. Entrada")
+    print("2. Salida")
+    tipo = input("Seleccione tipo: ").strip()
+    
+    try:
+        cantidad = int(input("Cantidad a mover: "))
+        if cantidad <= 0: raise ValueError("La cantidad debe ser mayor a 0")
+        
+        if tipo == "1": # Entrada
+            producto['cantidad'] += cantidad
+            accion = "ENTRADA"  # <--- Variable para el log
+            print(f"✅ Stock actualizado.")
+            
+        elif tipo == "2": # Salida
+            if cantidad > producto['cantidad']:
+                print("❌ ¡Error! No hay suficiente stock.")
+                return
+            producto['cantidad'] -= cantidad
+            accion = "SALIDA"   # <--- Variable para el log
+            print(f"✅ Stock actualizado.")
+        else:
+            return
+
+        # Guardar en JSON
+        productos[indice] = producto
+        db.guardar_datos(productos)
+        
+        # --- AQUÍ GUARDAMOS EL LOG ---
+        mensaje_log = f"{accion} de {cantidad} unidades - Producto: {producto['nombre']} (SKU: {producto['sku']})"
+        registrar_accion(mensaje_log, usuario="Admin") # Puedes pasar el usuario real si modificas la función para recibirlo
+        # -----------------------------
+        
+    except ValueError:
+        print("Error de datos.")
+        
+    input("Enter para continuar...")
+    
 def listar_productos(db):
     productos = db.leer_datos()
     mostrar_tabla(productos)

@@ -1,6 +1,8 @@
 from gestor_datos import GestorDatos
 from auth import autenticar_usuario, registrar_usuario_nuevo
 import os
+import shutil
+import datetime
 from inventory import menu_inventario
 from reports import menu_reportes
 from admin_users import menu_usuarios
@@ -40,7 +42,36 @@ def menu_principal(usuario_actual):
         else:
             print("Opción no válida.")
 
+def realizar_backup_automatico():
+    """Crea una copia de los archivos JSON en la carpeta data/backups"""
+    print("Generando copia de seguridad...")
+    
+    # Rutas dinámicas (igual que en gestor_datos)
+    ruta_actual = os.path.abspath(__file__)
+    carpeta_proyecto = os.path.dirname(os.path.dirname(ruta_actual))
+    carpeta_data = os.path.join(carpeta_proyecto, "data")
+    carpeta_backups = os.path.join(carpeta_data, "backups")
+    
+    # Crear carpeta backups si no existe
+    if not os.path.exists(carpeta_backups):
+        os.makedirs(carpeta_backups)
+    
+    fecha = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    
+    archivos_a_respaldar = ["productos.json", "usuarios.json"]
+    
+    for archivo in archivos_a_respaldar:
+        origen = os.path.join(carpeta_data, archivo)
+        if os.path.exists(origen):
+            destino = os.path.join(carpeta_backups, f"{archivo}_backup_{fecha}.json")
+            try:
+                shutil.copy2(origen, destino)
+                # print(f"Backup creado: {destino}") # Descomentar si quieres ver el mensaje
+            except Exception as e:
+                print(f"Error backup {archivo}: {e}")
+
 def inicializar_sistema():
+    realizar_backup_automatico()
     # 1. Aseguramos que existan datos básicos
     db = GestorDatos("usuarios.json")
     if not db.leer_datos():
