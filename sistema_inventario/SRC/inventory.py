@@ -11,11 +11,12 @@ def menu_inventario():
         limpiar_pantalla()
         print("\n=== GESTIÓN DE INVENTARIO ===")
         print("1. Ver Todos los Productos")
-        print("2. Buscar Producto (Filtro)")  # <--- NUEVO
+        print("2. Buscar Producto (Filtro)")
         print("3. Agregar Producto")
-        print("4. Editar Producto")           # <--- NUEVO
-        print("5. Eliminar Producto")         # <--- NUEVO
-        print("6. Volver al Menú Principal")
+        print("4. Editar Producto")
+        print("5. Eliminar Producto")
+        print("6. Registrar Movimiento (Entrada/Salida)")  # <--- NUEVO
+        print("7. Volver al Menú Principal")
         
         opcion = input("\nOpción: ")
         
@@ -30,6 +31,8 @@ def menu_inventario():
         elif opcion == "5":
             eliminar_producto(db)
         elif opcion == "6":
+            registrar_movimiento(db)  # <--- CONECTADO
+        elif opcion == "7":
             break
         else:
             input("Opción no válida. Enter para continuar...")
@@ -53,17 +56,15 @@ def mostrar_tabla(lista_productos):
             print(f"{p['sku']:<10} {p['nombre']:<20} {p['categoria']:<15} ${p['precio']:<9} {p['cantidad']}")
 
 def buscar_producto(db):
-    """Cumple el requisito de Filtros y Búsquedas"""
     productos = db.leer_datos()
     limpiar_pantalla()
     print("\n--- BUSCAR PRODUCTO ---")
     termino = input("Ingrese nombre o categoría a buscar: ").strip().lower()
     
-    # Filtramos usando List Comprehension
     resultados = [p for p in productos if termino in p['nombre'].lower() or termino in p['categoria'].lower()]
     
     if resultados:
-        mostrar_tabla(resultados) # Reusamos la función de mostrar
+        mostrar_tabla(resultados)
     else:
         print(f"\nNo se encontraron productos que coincidan con '{termino}'.")
         
@@ -91,7 +92,7 @@ def agregar_producto(db):
         if cantidad < 0: raise ValueError("La cantidad no puede ser negativa")
         
     except ValueError as e:
-        print(f"¡Error! {e}") # Capturamos si pone letras o negativos
+        print(f"¡Error! {e}")
         input("Enter para continuar...")
         return
 
@@ -113,7 +114,6 @@ def editar_producto(db):
     print("\n--- EDITAR PRODUCTO ---")
     sku_buscar = input("Ingrese el SKU del producto a editar: ").strip().upper()
     
-    # Encontrar el índice del producto
     indice = -1
     for i, p in enumerate(productos):
         if p['sku'] == sku_buscar:
@@ -132,7 +132,6 @@ def editar_producto(db):
     nuevo_nombre = input("Nuevo nombre: ").strip()
     nuevo_precio_str = input("Nuevo precio: ").strip()
     
-    # Aplicamos cambios solo si el usuario escribió algo
     if nuevo_nombre:
         prod['nombre'] = nuevo_nombre
     
@@ -144,7 +143,6 @@ def editar_producto(db):
         except ValueError:
             print("Precio inválido. No se actualizó el precio.")
 
-    # Guardamos la lista actualizada
     productos[indice] = prod
     db.guardar_datos(productos)
     print("\nProducto actualizado correctamente.")
@@ -155,7 +153,6 @@ def eliminar_producto(db):
     print("\n--- ELIMINAR PRODUCTO ---")
     sku_buscar = input("Ingrese el SKU del producto a eliminar: ").strip().upper()
     
-    # Creamos una lista nueva SIN ese producto
     nueva_lista = [p for p in productos if p['sku'] != sku_buscar]
     
     if len(nueva_lista) == len(productos):
@@ -168,4 +165,56 @@ def eliminar_producto(db):
         else:
             print("Operación cancelada.")
             
+    input("Enter para continuar...")
+
+def registrar_movimiento(db):
+    """NUEVA FUNCIÓN: Permite sumar o restar stock fácilmente"""
+    productos = db.leer_datos()
+    print("\n--- REGISTRAR MOVIMIENTO DE STOCK ---")
+    sku_buscar = input("SKU del producto: ").strip().upper()
+    
+    producto = None
+    indice = -1
+    for i, p in enumerate(productos):
+        if p['sku'] == sku_buscar:
+            producto = p
+            indice = i
+            break
+    
+    if not producto:
+        print("Producto no encontrado.")
+        input("Enter para continuar...")
+        return
+
+    print(f"Producto: {producto['nombre']} | Stock actual: {producto['cantidad']}")
+    print("1. Entrada (Compra/Devolución)")
+    print("2. Salida (Venta/Merma)")
+    tipo = input("Seleccione tipo de movimiento: ").strip()
+    
+    try:
+        cantidad = int(input("Cantidad a mover: "))
+        if cantidad <= 0: raise ValueError("La cantidad debe ser mayor a 0")
+        
+        if tipo == "1": # Entrada
+            producto['cantidad'] += cantidad
+            print(f"✅ Stock actualizado. Nuevo total: {producto['cantidad']}")
+            
+        elif tipo == "2": # Salida
+            if cantidad > producto['cantidad']:
+                print("❌ ¡Error! No hay suficiente stock para realizar esta salida.")
+                input("Enter para continuar...")
+                return
+            producto['cantidad'] -= cantidad
+            print(f"✅ Stock actualizado. Nuevo total: {producto['cantidad']}")
+            
+        else:
+            print("Opción inválida.")
+            return
+
+        productos[indice] = producto
+        db.guardar_datos(productos)
+        
+    except ValueError:
+        print("Error: Ingrese un número válido.")
+        
     input("Enter para continuar...")
