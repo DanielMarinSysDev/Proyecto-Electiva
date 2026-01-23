@@ -1,0 +1,9 @@
+[
+    {
+        "sku": "0001",
+        "nombre": "Laptop",
+        "categoria": "laptop",
+        "precio": 100.0,
+        "cantidad": 50
+    }
+]
