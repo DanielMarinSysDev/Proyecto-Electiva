@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Sum, F
+from django.db import models
 from django.http import HttpResponse
 from .models import Producto, HistorialMovimiento, validar_positivo
 from .forms import ProductoForm, MovimientoForm
