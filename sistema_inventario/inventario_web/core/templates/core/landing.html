@@ -1,0 +1,251 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvSystem - Gestión de Inventario Inteligente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #64748b;
+            --background: #0f172a;
+            /* Dark theme for landing */
+            --surface: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .nav-btn {
+            background-color: var(--surface);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid #334155;
+        }
+
+        .nav-btn:hover {
+            background-color: #334155;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.5);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .badge-new {
+            background-color: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 4rem;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        /* Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 2rem;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid #334155;
+            transition: transform 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            padding: 1rem;
+            background: rgba(79, 70, 229, 0.1);
+            border-radius: 0.75rem;
+            color: var(--primary);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-desc {
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-top: 1px solid #334155;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="brand">
+            Inv<span>System</span>
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="nav-btn btn-primary">Ir al Dashboard</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="nav-btn">Iniciar Sesión</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="badge-new">✨ Nuevo: Gestión Web 2.0</div>
+        <h1>Control total de tu inventario.<br>Simple y Rápido.</h1>
+        <p class="subtitle">
+            Gestiona productos, movimientos y reportes con una interfaz diseñada para ser eficiente y hermosa.
+        </p>
+
+        <div class="cta-buttons">
+            {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="btn-large btn-primary">Entrar al Sistema</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn-large btn-primary">Comenzar Ahora</a>
+            {% endif %}
+            <a href="https://danielmarinsysdev.me" class="nav-btn btn-large" style="background: transparent;">Volver al
+                Portafolio</a>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">Dashboard en Tiempo Real</h3>
+            <p class="feature-desc">Visualiza el estado de tu stock, valor total y alertas de manera instantánea.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3 class="feature-title">Movimientos Rápidos</h3>
+            <p class="feature-desc">Registra entradas y salidas en segundos. Todo queda registrado en el historial.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📑</div>
+            <h3 class="feature-title">Reportes Automáticos</h3>
+            <p class="feature-desc">Genera reportes detallados y expórtalos a CSV con un solo clic.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p style="color: var(--text-muted);">© 2026 DanielMarinSysDev. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+
+</html>

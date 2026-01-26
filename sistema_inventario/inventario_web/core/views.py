@@ -9,6 +9,12 @@ from django.utils import timezone
 import csv
 
 # --- DASHBOARD & HOME ---
+# --- DASHBOARD & HOME ---
+def home(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    return render(request, 'core/landing.html')
+
 @login_required
 def dashboard(request):
     total_productos = Producto.objects.aggregate(total=Sum('cantidad'))['total'] or 0
