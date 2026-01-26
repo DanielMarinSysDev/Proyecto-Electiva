@@ -20,11 +20,10 @@
         <span class="stat-value">${{ valor_inventario|floatformat:2 }}</span>
     </div>
 
-    <div class="card stat-card"
-        style="border-left: 4px solid {% if productos_bajo_stock > 0 %}var(--danger){% else %}var(--success){% endif %};">
+    <div
+        class="card stat-card {% if productos_bajo_stock > 0 %}border-left-danger{% else %}border-left-success{% endif %}">
         <span class="stat-label">Bajo Stock</span>
-        <span class="stat-value"
-            style="color: {% if productos_bajo_stock > 0 %}var(--danger){% else %}var(--success){% endif %};">
+        <span class="stat-value {% if productos_bajo_stock > 0 %}text-danger{% else %}text-success{% endif %}">
             {{ productos_bajo_stock }}
         </span>
     </div>

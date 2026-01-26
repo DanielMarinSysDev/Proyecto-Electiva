@@ -34,7 +34,7 @@
                     <td><span class="badge" style="background: #f1f5f9; color: var(--text-muted);">{{ p.categoria
                             }}</span></td>
                     <td>${{ p.precio }}</td>
-                    <td style="font-weight: 700; {% if p.cantidad < 5 %}color: var(--danger);{% endif %}">
+                    <td style="font-weight: 700;" class="{% if p.cantidad < 5 %}text-danger{% endif %}">
                         {{ p.cantidad }}
                     </td>
                     <td>
