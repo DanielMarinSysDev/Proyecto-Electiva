@@ -1,0 +1,70 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">Dashboard</h1>
+    <a href="{% url 'crear_producto' %}" class="btn btn-primary">
+        <span>+</span> Nuevo Producto
+    </a>
+</div>
+
+<div class="grid grid-3">
+    <!-- Stats Cards -->
+    <div class="card stat-card">
+        <span class="stat-label">Total Productos</span>
+        <span class="stat-value">{{ total_productos }}</span>
+    </div>
+
+    <div class="card stat-card">
+        <span class="stat-label">Valor del Inventario</span>
+        <span class="stat-value">${{ valor_inventario|floatformat:2 }}</span>
+    </div>
+
+    <div class="card stat-card"
+        style="border-left: 4px solid {% if productos_bajo_stock > 0 %}var(--danger){% else %}var(--success){% endif %};">
+        <span class="stat-label">Bajo Stock</span>
+        <span class="stat-value"
+            style="color: {% if productos_bajo_stock > 0 %}var(--danger){% else %}var(--success){% endif %};">
+            {{ productos_bajo_stock }}
+        </span>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Movimientos Recientes</h3>
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>FECHA</th>
+                    <th>TIPO</th>
+                    <th>PRODUCTO</th>
+                    <th>CANTIDAD</th>
+                    <th>USUARIO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mov in ultimos_movimientos %}
+                <tr>
+                    <td>{{ mov.fecha|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <span
+                            class="badge {% if mov.tipo == 'ENTRADA' %}badge-success{% elif mov.tipo == 'SALIDA' %}badge-danger{% else %}badge-warning{% endif %}">
+                            {{ mov.tipo }}
+                        </span>
+                    </td>
+                    <td>{{ mov.producto_nombre }}</td>
+                    <td>{{ mov.cantidad }}</td>
+                    <td>{{ mov.usuario.username|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted);">No hay movimientos recientes.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

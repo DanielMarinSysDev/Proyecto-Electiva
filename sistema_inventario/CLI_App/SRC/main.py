@@ -19,8 +19,8 @@ def menu_principal(usuario_actual):
         print("\n" + "="*30)
         print(f" SISTEMA DE INVENTARIO - Usuario: {usuario_actual['username']} ({usuario_actual['rol']})")
         print("="*30)
-        print("1. Gestión de Inventario (Próximamente)")
-        print("2. Reportes (Próximamente)")
+        print("1. Gestión de Inventario")
+        print("2. Reportes")
         
         # Solo mostramos opción de crear usuarios si es admin
         if usuario_actual['rol'] == 'admin':

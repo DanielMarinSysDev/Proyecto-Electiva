@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">{{ titulo }}</h1>
+    <a href="{% url 'lista_productos' %}" class="btn btn-outline">Cancelar</a>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="alert alert-error">
+            <strong>Error:</strong> Por favor corrige los errores abajo.
+        </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <small style="color: var(--danger);">{{ field.errors.0 }}</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary">Guardar Producto</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

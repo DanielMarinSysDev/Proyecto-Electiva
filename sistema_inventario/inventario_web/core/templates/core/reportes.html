@@ -1,0 +1,44 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">Reportes</h1>
+    <a href="{% url 'exportar_reporte' %}" class="btn btn-outline">
+        <span>📥</span> Descargar CSV
+    </a>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 1.5rem; color: var(--danger);">⚠️ Alerta de Stock Bajo</h3>
+
+    {% if bajos_stock %}
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>PRODUCTO</th>
+                    <th>STOCK ACTUAL</th>
+                    <th>ESTADO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in bajos_stock %}
+                <tr>
+                    <td>{{ p.sku }}</td>
+                    <td>{{ p.nombre }}</td>
+                    <td style="font-weight: bold;">{{ p.cantidad }}</td>
+                    <td><span class="badge badge-danger">Crítico</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div
+        style="padding: 2rem; text-align: center; color: var(--success); background: #f0fdf4; border-radius: var(--radius);">
+        ✅ Todo el inventario tiene niveles saludables de stock.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
