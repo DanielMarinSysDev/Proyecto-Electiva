@@ -12,6 +12,12 @@ urlpatterns = [
     path('productos/movimiento/<int:pk>/', views.registrar_movimiento, name='registrar_movimiento'),
     path('reportes/', views.reportes, name='reportes'),
     path('reportes/exportar/', views.exportar_reporte, name='exportar_reporte'),
+    path('reportes/pdf/', views.exportar_pdf, name='exportar_pdf'),
+    
+    # User Management
+    path('usuarios/', views.lista_usuarios, name='lista_usuarios'),
+    path('usuarios/nuevo/', views.crear_usuario, name='crear_usuario'),
+    path('usuarios/eliminar/<int:pk>/', views.eliminar_usuario, name='eliminar_usuario'),
     
     # Auth Views
     path('login/', auth_views.LoginView.as_view(template_name='core/login.html'), name='login'),

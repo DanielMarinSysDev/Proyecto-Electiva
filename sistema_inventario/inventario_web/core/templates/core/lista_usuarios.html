@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">Gestión de Usuarios</h1>
+    <div style="display: flex; gap: 1rem;">
+        <a href="{% url 'crear_usuario' %}" class="btn btn-primary">
+            <span>+</span> Nuevo Usuario
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>USUARIO</th>
+                    <th>EMAIL</th>
+                    <th>ROL</th>
+                    <th>FECHA REGISTRO</th>
+                    <th>ESTADO</th>
+                    <th>ACCIONES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in usuarios %}
+                <tr>
+                    <td style="font-weight: 600;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div
+                                style="width: 32px; height: 32px; background: #eef2ff; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                {{ u.username|make_list|first|upper }}
+                            </div>
+                            {{ u.username }}
+                        </div>
+                    </td>
+                    <td>{{ u.email|default:"-" }}</td>
+                    <td>
+                        {% if u.is_superuser %}
+                        <span class="badge badge-success">Administrador</span>
+                        {% else %}
+                        <span class="badge" style="background: #f1f5f9; color: var(--text-muted);">Staff</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ u.date_joined|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if u.is_active %}
+                        <span style="color: var(--success);">● Activo</span>
+                        {% else %}
+                        <span style="color: var(--danger);">● Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not u.is_superuser and u != request.user %}
+                        <a href="{% url 'eliminar_usuario' u.pk %}" class="btn btn-outline"
+                            style="padding: 0.25rem 0.5rem; color: var(--danger); border-color: var(--danger);"
+                            title="Eliminar">🗑️</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

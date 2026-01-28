@@ -3,9 +3,14 @@
 {% block content %}
 <div class="header">
     <h1 class="page-title">Reportes</h1>
-    <a href="{% url 'exportar_reporte' %}" class="btn btn-outline">
-        <span>📥</span> Descargar CSV
-    </a>
+    <div style="display: flex; gap: 0.5rem;">
+        <a href="{% url 'exportar_reporte' %}" class="btn btn-outline">
+            <span>📥</span> CSV
+        </a>
+        <a href="{% url 'exportar_pdf' %}" class="btn btn-primary">
+            <span>📄</span> PDF
+        </a>
+    </div>
 </div>
 
 <div class="card">

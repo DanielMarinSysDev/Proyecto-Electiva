@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Sum, F
 from django.db import models
@@ -40,7 +41,15 @@ def lista_productos(request):
     if query:
         productos = productos.filter(models.Q(nombre__icontains=query) | models.Q(sku__icontains=query))
     
-    return render(request, 'core/lista_productos.html', {'productos': productos})
+    # Calculate Total Inventory Value
+    valor_inventario = productos.aggregate(
+        valor=Sum(F('precio') * F('cantidad'), output_field=models.DecimalField())
+    )['valor'] or 0
+
+    return render(request, 'core/lista_productos.html', {
+        'productos': productos, 
+        'valor_inventario': valor_inventario
+    })
 
 @login_required
 @permission_required('core.add_producto')
@@ -55,6 +64,7 @@ def crear_producto(request):
                 tipo='CREACION',
                 cantidad=producto.cantidad
             )
+            messages.success(request, f'Producto "{producto.nombre}" creado correctamente.')
             return redirect('lista_productos')
     else:
         form = ProductoForm()
@@ -74,6 +84,7 @@ def editar_producto(request, pk):
                 tipo='EDICION',
                 cantidad=0 # No changed stock, just details
             )
+            messages.success(request, f'Producto "{producto.nombre}" actualizado correctamente.')
             return redirect('lista_productos')
     else:
         form = ProductoForm(instance=producto)
@@ -90,7 +101,9 @@ def eliminar_producto(request, pk):
             tipo='ELIMINACION',
             cantidad=producto.cantidad
         )
+        nombre = producto.nombre
         producto.delete()
+        messages.success(request, f'Producto "{nombre}" eliminado correctamente.')
         return redirect('lista_productos')
     return render(request, 'core/confirmar_eliminar.html', {'producto': producto})
 
@@ -110,9 +123,11 @@ def registrar_movimiento(request, pk):
             
             if tipo == 'ENTRADA':
                 producto.cantidad += cantidad
+                messages.success(request, f'Entrada de {cantidad} unidades registrada.')
             elif tipo == 'SALIDA':
                 if producto.cantidad >= cantidad:
                     producto.cantidad -= cantidad
+                    messages.success(request, f'Salida de {cantidad} unidades registrada.')
                 else:
                     form.add_error('cantidad', 'No hay suficiente stock.')
                     return render(request, 'core/form_movimiento.html', {'form': form, 'producto': producto})
@@ -141,4 +156,66 @@ def exportar_reporte(request):
     for p in Producto.objects.all():
         writer.writerow([p.sku, p.nombre, p.categoria, p.precio, p.cantidad])
         
+    return response
+
+# --- USERS MANAGEMENT (Admin Only) ---
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+
+@login_required
+@permission_required('auth.view_user', raise_exception=True)
+def lista_usuarios(request):
+    usuarios = User.objects.all().order_by('date_joined')
+    return render(request, 'core/lista_usuarios.html', {'usuarios': usuarios})
+
+@login_required
+@permission_required('auth.add_user', raise_exception=True)
+def crear_usuario(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f'Usuario "{user.username}" creado exitosamente.')
+            return redirect('lista_usuarios')
+    else:
+        form = UserCreationForm()
+    return render(request, 'core/form_usuario.html', {'form': form, 'titulo': 'Nuevo Usuario'})
+
+@login_required
+@permission_required('auth.delete_user', raise_exception=True)
+def eliminar_usuario(request, pk):
+    usuario = get_object_or_404(User, pk=pk)
+    if usuario.is_superuser:
+        messages.error(request, 'No puedes eliminar a un superusuario.')
+        return redirect('lista_usuarios')
+    
+    if request.method == 'POST':
+        nombre = usuario.username
+        usuario.delete()
+        messages.success(request, f'Usuario "{nombre}" eliminado.')
+        return redirect('lista_usuarios')
+    
+    return render(request, 'core/confirmar_eliminar.html', {'producto': usuario, 'titulo': f'Eliminar Usuario {usuario.username}'})
+
+# --- PDF GENERATION ---
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.http import HttpResponse
+
+@login_required
+def exportar_pdf(request):
+    productos = Producto.objects.all()
+    template_path = 'core/reporte_pdf.html'
+    context = {'productos': productos, 'fecha': timezone.now()}
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="inventario_{timezone.now().date()}.pdf"'
+    
+    template = get_template(template_path)
+    html = template.render(context)
+    
+    pisa_status = pisa.CreatePDF(
+       html, dest=response)
+       
+    if pisa_status.err:
+       return HttpResponse('Error al generar PDF <pre>' + html + '</pre>')
     return response

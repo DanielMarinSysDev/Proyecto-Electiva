@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Reporte de Inventario</title>
+    <style type="text/css">
+        body {
+            font-family: Helvetica, sans-serif;
+            font-size: 12px;
+        }
+
+        h1 {
+            color: #4f46e5;
+            text-align: center;
+        }
+
+        .meta {
+            text-align: right;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #333;
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stock {
+            font-weight: bold;
+        }
+
+        .bajo-stock {
+            color: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Reporte General de Inventario</h1>
+    <div class="meta">
+        Fecha: {{ fecha|date:"d/m/Y H:i" }}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>SKU</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in productos %}
+            <tr>
+                <td>{{ p.sku }}</td>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.categoria }}</td>
+                <td>${{ p.precio }}</td>
+                <td class="stock {% if p.cantidad < 5 %}bajo-stock{% endif %}">{{ p.cantidad }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>
