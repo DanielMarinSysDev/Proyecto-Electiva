@@ -52,11 +52,15 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if not u.is_superuser and u != request.user %}
-                        <a href="{% url 'eliminar_usuario' u.pk %}" class="btn btn-outline"
-                            style="padding: 0.25rem 0.5rem; color: var(--danger); border-color: var(--danger);"
-                            title="Eliminar">🗑️</a>
-                        {% endif %}
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'editar_usuario' u.pk %}" class="btn btn-outline"
+                                style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" title="Editar">✏️</a>
+                            {% if not u.is_superuser and u != request.user %}
+                            <a href="{% url 'eliminar_usuario' u.pk %}" class="btn btn-outline"
+                                style="padding: 0.25rem 0.5rem; color: var(--danger); border-color: var(--danger);"
+                                title="Eliminar">🗑️</a>
+                            {% endif %}
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}

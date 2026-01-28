@@ -198,6 +198,55 @@ def eliminar_usuario(request, pk):
     
     return render(request, 'core/confirmar_eliminar.html', {'producto': usuario, 'titulo': f'Eliminar Usuario {usuario.username}'})
 
+@login_required
+@permission_required('auth.change_user', raise_exception=True)
+def editar_usuario(request, pk):
+    usuario = get_object_or_404(User, pk=pk)
+    
+    # Prevent editing superusers by non-superusers (redundant if only superuser has perms, but safe)
+    if usuario.is_superuser and not request.user.is_superuser:
+        messages.error(request, 'No tienes permiso para editar administradores.')
+        return redirect('lista_usuarios')
+
+    from .forms import UsuarioEditForm # Import here to avoid circulars if any
+    
+    if request.method == 'POST':
+        form = UsuarioEditForm(request.POST, instance=usuario)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Usuario "{usuario.username}" actualizado al 100%.')
+            return redirect('lista_usuarios')
+    else:
+        form = UsuarioEditForm(instance=usuario)
+    
+    return render(request, 'core/form_usuario.html', {
+        'form': form, 
+        'titulo': f'Editar Usuario: {usuario.username}',
+        'usuario_editar': usuario # Pass user to template to show "Change Password" link
+    })
+
+from django.contrib.auth.forms import SetPasswordForm
+
+@login_required
+@permission_required('auth.change_user', raise_exception=True)
+def cambiar_password(request, pk):
+    usuario = get_object_or_404(User, pk=pk)
+    
+    if request.method == 'POST':
+        form = SetPasswordForm(usuario, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Contraseña de "{usuario.username}" actualizada.')
+            return redirect('lista_usuarios')
+    else:
+        form = SetPasswordForm(usuario)
+        
+    return render(request, 'core/form_password.html', {
+        'form': form,
+        'titulo': f'Cambiar Contraseña: {usuario.username}'
+    })
+
+
 # --- PDF GENERATION ---
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
