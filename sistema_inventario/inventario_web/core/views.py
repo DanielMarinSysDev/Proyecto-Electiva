@@ -52,7 +52,7 @@ def lista_productos(request):
     })
 
 @login_required
-@permission_required('core.add_producto')
+@permission_required('core.add_producto', raise_exception=True)
 def crear_producto(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST)
@@ -71,7 +71,8 @@ def crear_producto(request):
     return render(request, 'core/form_producto.html', {'form': form, 'titulo': 'Nuevo Producto'})
 
 @login_required
-@permission_required('core.change_producto')
+@login_required
+@permission_required('core.change_producto', raise_exception=True)
 def editar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     if request.method == 'POST':
@@ -91,7 +92,7 @@ def editar_producto(request, pk):
     return render(request, 'core/form_producto.html', {'form': form, 'titulo': f'Editar {producto.nombre}'})
 
 @login_required
-@permission_required('core.delete_producto')
+@permission_required('core.delete_producto', raise_exception=True)
 def eliminar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     if request.method == 'POST':
