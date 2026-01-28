@@ -198,24 +198,63 @@ def eliminar_usuario(request, pk):
     return render(request, 'core/confirmar_eliminar.html', {'producto': usuario, 'titulo': f'Eliminar Usuario {usuario.username}'})
 
 # --- PDF GENERATION ---
-from django.template.loader import get_template
-from xhtml2pdf import pisa
 from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 @login_required
 def exportar_pdf(request):
-    productos = Producto.objects.all()
-    template_path = 'core/reporte_pdf.html'
-    context = {'productos': productos, 'fecha': timezone.now()}
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="inventario_{timezone.now().date()}.pdf"'
+    filename = f"inventario_{timezone.now().date()}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    elements = []
+    styles = getSampleStyleSheet()
     
-    template = get_template(template_path)
-    html = template.render(context)
+    # Title
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        spaceAfter=30,
+        alignment=1 # Center
+    )
+    elements.append(Paragraph("Reporte de Inventario", title_style))
+    elements.append(Paragraph(f"Fecha: {timezone.now().strftime('%d/%m/%Y %H:%M')}", styles['Normal']))
+    elements.append(Spacer(1, 20))
+
+    # Data
+    data = [['SKU', 'Nombre', 'Categoría', 'Precio', 'Stock']]
+    productos = Producto.objects.all()
     
-    pisa_status = pisa.CreatePDF(
-       html, dest=response)
-       
-    if pisa_status.err:
-       return HttpResponse('Error al generar PDF <pre>' + html + '</pre>')
+    for p in productos:
+        data.append([
+            p.sku,
+            p.nombre[:30], # Truncate long names
+            p.categoria,
+            f"${p.precio}",
+            str(p.cantidad)
+        ])
+
+    # Table configuration
+    table = Table(data, colWidths=[80, 200, 100, 80, 60])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4f46e5')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (-1, 0), (-1, -1), 'CENTER'), # Center Stock column
+    ]))
+    
+    elements.append(table)
+    doc.build(elements)
+    
     return response
