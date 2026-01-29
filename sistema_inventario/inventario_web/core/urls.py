@@ -4,12 +4,15 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('catalogo/', views.public_catalog, name='public_catalog'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('productos/', views.lista_productos, name='lista_productos'),
     path('productos/nuevo/', views.crear_producto, name='crear_producto'),
     path('productos/editar/<int:pk>/', views.editar_producto, name='editar_producto'),
     path('productos/eliminar/<int:pk>/', views.eliminar_producto, name='eliminar_producto'),
     path('productos/movimiento/<int:pk>/', views.registrar_movimiento, name='registrar_movimiento'),
+    path('productos/qr/<int:pk>/', views.generar_qr, name='generar_qr'),
+    path('api/movimiento/<int:pk>/', views.api_registrar_movimiento, name='api_registrar_movimiento'),
     path('reportes/', views.reportes, name='reportes'),
     path('reportes/exportar/', views.exportar_reporte, name='exportar_reporte'),
     path('reportes/pdf/', views.exportar_pdf, name='exportar_pdf'),

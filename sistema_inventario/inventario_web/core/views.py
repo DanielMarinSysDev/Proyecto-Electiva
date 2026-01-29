@@ -16,6 +16,13 @@ def home(request):
         return redirect('dashboard')
     return render(request, 'core/landing.html')
 
+def public_catalog(request):
+    productos = Producto.objects.all().order_by('categoria', 'nombre')
+    query = request.GET.get('q')
+    if query:
+        productos = productos.filter(models.Q(nombre__icontains=query) | models.Q(categoria__icontains=query))
+    return render(request, 'core/public_catalog.html', {'productos': productos})
+
 @login_required
 def dashboard(request):
     total_productos = Producto.objects.aggregate(total=Sum('cantidad'))['total'] or 0
@@ -139,6 +146,59 @@ def registrar_movimiento(request, pk):
     else:
         form = MovimientoForm()
     return render(request, 'core/form_movimiento.html', {'form': form, 'producto': producto})
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
+@login_required
+@require_POST
+def api_registrar_movimiento(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    try:
+        data = json.loads(request.body)
+        tipo = data.get('tipo')
+        cantidad = int(data.get('cantidad', 0))
+        
+        if cantidad <= 0:
+            return JsonResponse({'success': False, 'error': 'La cantidad debe ser mayor a 0.'})
+
+        if tipo == 'ENTRADA':
+            producto.cantidad += cantidad
+            action_msg = f'Entrada de {cantidad}'
+        elif tipo == 'SALIDA':
+            if producto.cantidad >= cantidad:
+                producto.cantidad -= cantidad
+                action_msg = f'Salida de {cantidad}'
+            else:
+                return JsonResponse({'success': False, 'error': 'Stock insuficiente.'})
+        else:
+            return JsonResponse({'success': False, 'error': 'Tipo de movimiento inválido.'})
+
+        producto.save()
+        
+        # Guardar historial
+        HistorialMovimiento.objects.create(
+            producto=producto,
+            usuario=request.user,
+            tipo=tipo,
+            cantidad=cantidad
+        )
+        
+        # Recalcular valor total del inventario para devolverlo
+        total_valor = Producto.objects.aggregate(
+            valor=Sum(F('precio') * F('cantidad'), output_field=models.DecimalField())
+        )['valor'] or 0
+
+        return JsonResponse({
+            'success': True, 
+            'message': f'{action_msg} registrada correctamente.',
+            'new_stock': producto.cantidad,
+            'total_valor': float(total_valor) # Convert to float for JSON
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
 # --- REPORTS ---
 @login_required
@@ -308,3 +368,21 @@ def exportar_pdf(request):
     doc.build(elements)
     
     return response
+
+# --- QR CODE GENERATION ---
+import qrcode
+from io import BytesIO
+
+@login_required
+def generar_qr(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    # URL pointing to public catalog filtering by SKU
+    base_url = request.build_absolute_uri('/catalogo/')
+    qr_data = f"{base_url}?q={producto.sku}"
+    
+    img = qrcode.make(qr_data)
+    buffer = BytesIO()
+    img.save(buffer)
+    buffer.seek(0)
+    
+    return HttpResponse(buffer, content_type='image/png')
