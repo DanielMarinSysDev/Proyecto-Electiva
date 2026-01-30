@@ -184,12 +184,17 @@
             </svg>
             InvSystem <span style="font-weight: 300; opacity: 0.7;">Catálogo</span>
         </a>
-        {% if user.is_authenticated %}
-        <a href="{% url 'dashboard' %}" style="text-decoration: none; color: var(--primary); font-weight: 500;">Ir al
-            PanelAdmin &rarr;</a>
-        {% else %}
-        <a href="{% url 'login' %}" style="text-decoration: none; color: var(--text-muted);">Admin Login</a>
-        {% endif %}
+        <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <a href="{% url 'home' %}"
+                style="text-decoration: none; color: var(--text-muted); font-weight: 500;">Inicio</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" style="text-decoration: none; color: var(--primary); font-weight: 500;">Ir
+                al
+                PanelAdmin &rarr;</a>
+            {% else %}
+            <a href="{% url 'login' %}" style="text-decoration: none; color: var(--text-muted);">Admin Login</a>
+            {% endif %}
+        </div>
     </nav>
 
     <div class="container">
