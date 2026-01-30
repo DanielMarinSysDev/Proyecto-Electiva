@@ -30,7 +30,7 @@ class HistorialMovimiento(models.Model):
         ('ELIMINACION', 'Eliminación'),
     ]
 
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, null=True, blank=True) # Null=True para conservar historial si se borra producto (opcional, o SET_NULL)
+    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True, blank=True)
     # Nota: Si se borra el producto, idealmente deberíamos guardar al menos el nombre o SKU en otro campo para referencia.
     # Por simplicidad ahora, si se borra el producto, dejaremos este campo null o se borrará en cascada según lógica de negocio.
     # Cambiemos a SET_NULL para mantener el registro.
