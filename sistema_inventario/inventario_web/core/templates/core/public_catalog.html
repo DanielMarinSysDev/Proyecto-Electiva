@@ -211,15 +211,15 @@
 
                     {% if p.cantidad > 10 %}
                     <div class="status-badge status-success">
-                        <span>●</span> Disponible
+                        <span>●</span> Disponible ({{ p.cantidad }})
                     </div>
                     {% elif p.cantidad > 0 %}
                     <div class="status-badge status-warning">
-                        <span>●</span> Pocas Unidades
+                        <span>●</span> Pocas Unidades ({{ p.cantidad }})
                     </div>
                     {% else %}
                     <div class="status-badge status-danger">
-                        <span>●</span> Agotado
+                        <span>●</span> Agotado ({{ p.cantidad }})
                     </div>
                     {% endif %}
                 </div>
