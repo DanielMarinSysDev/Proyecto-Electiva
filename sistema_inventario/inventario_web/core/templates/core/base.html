@@ -349,9 +349,20 @@
 
         <div style="margin-bottom: 2rem; padding: 1rem; background: var(--background); border-radius: 0.5rem;">
             <div style="font-weight: 600; font-size: 0.9rem;">{{ user.username }}</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">
                 {% if user.is_superuser %}Administrador{% else %}Usuario{% endif %}
             </div>
+            <a href="{% url 'perfil_usuario' %}"
+                style="font-size: 0.8rem; text-decoration: none; color: var(--primary);">
+                ⚙️ Mi Perfil
+            </a>
+            {% if user.is_superuser %}
+            <br>
+            <a href="{% url 'audit_logs' %}"
+                style="font-size: 0.8rem; text-decoration: none; color: var(--text-muted); display: inline-block; margin-top: 0.25rem;">
+                🔐 Auditoría
+            </a>
+            {% endif %}
         </div>
 
         <ul class="nav-links">

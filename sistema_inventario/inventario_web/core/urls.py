@@ -23,7 +23,9 @@ urlpatterns = [
     path('usuarios/nuevo/', views.crear_usuario, name='crear_usuario'),
     path('usuarios/editar/<int:pk>/', views.editar_usuario, name='editar_usuario'),
     path('usuarios/password/<int:pk>/', views.cambiar_password, name='cambiar_password'),
-    path('usuarios/eliminar/<int:pk>/', views.eliminar_usuario, name='eliminar_usuario'),
+    path('usuarios/eliminar/<int:pk>/', views.eliminar_usuario, name='eliminar_usuario'), # Admin delete user
+    path('perfil/', views.perfil_usuario, name='perfil_usuario'), # Self-service profile
+    path('admin/audit/', views.audit_logs, name='audit_logs'), # Audit Log
     
     # Auth Views
     path('login/', auth_views.LoginView.as_view(template_name='core/login.html'), name='login'),

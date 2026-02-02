@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Sum, F
 from django.db import models
 from django.http import HttpResponse
-from .models import Producto, HistorialMovimiento, validar_positivo
+from .models import Producto, HistorialMovimiento, UserAudit, validar_positivo
 from .forms import ProductoForm, MovimientoForm
 from django.utils import timezone
 import csv
@@ -301,6 +303,30 @@ def editar_usuario(request, pk):
         'titulo': f'Editar Usuario: {usuario.username}',
         'usuario_editar': usuario # Pass user to template to show "Change Password" link
     })
+
+@login_required
+def perfil_usuario(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Keep user logged in
+            messages.success(request, 'Tu contraseña ha sido actualizada correctamente.')
+            return redirect('perfil_usuario')
+    else:
+        form = PasswordChangeForm(request.user)
+    
+    return render(request, 'core/perfil.html', {'form': form})
+
+@login_required
+def audit_logs(request):
+    if not request.user.is_superuser:
+        messages.error(request, 'Acceso denegado. Solo administradores pueden ver los registros de auditoría.')
+        return redirect('dashboard')
+    
+    logs = UserAudit.objects.all().order_by('-timestamp')[:100] # Limit to 100 for perf
+    return render(request, 'core/admin_audit.html', {'logs': logs})
+
 
 from django.contrib.auth.forms import SetPasswordForm
 
