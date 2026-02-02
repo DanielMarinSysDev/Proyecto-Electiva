@@ -20,7 +20,7 @@
                 <label class="form-label">{{ field.label }}</label>
                 {{ field }}
                 {% if field.help_text %}
-                <small style="display: block; color: var(--text-muted); margin-top: 0.25rem;">{{ field.help_text
+                <small style="display: block; color: var(--text-muted); margin-top: 0.25rem;">{{ field.help_text|safe
                     }}</small>
                 {% endif %}
                 {% for error in field.errors %}
