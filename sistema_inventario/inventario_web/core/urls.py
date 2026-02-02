@@ -26,6 +26,7 @@ urlpatterns = [
     path('usuarios/eliminar/<int:pk>/', views.eliminar_usuario, name='eliminar_usuario'), # Admin delete user
     path('perfil/', views.perfil_usuario, name='perfil_usuario'), # Self-service profile
     path('seguridad/auditoria/', views.audit_logs, name='audit_logs'), # Audit Log - Changed to avoid admin/ conflict
+    path('seguridad/respaldo/', views.admin_backup, name='admin_backup'), # JSON Backup
     
     # Auth Views
     path('login/', auth_views.LoginView.as_view(template_name='core/login.html'), name='login'),

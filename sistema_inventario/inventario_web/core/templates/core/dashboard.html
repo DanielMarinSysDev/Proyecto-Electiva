@@ -33,14 +33,21 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <h3 style="font-size: 1.25rem;">Movimientos Recientes</h3>
         {% if user.is_superuser %}
-        <form action="{% url 'limpiar_movimientos' %}" method="post"
-            onsubmit="return confirm('¿Estás seguro de que quieres borrar TODO el historial de movimientos? Esta acción no se puede deshacer.');">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline"
-                style="color: var(--danger); border-color: var(--danger); font-size: 0.85rem;">
-                ⚠️ Limpiar Historial
-            </button>
-        </form>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <a href="{% url 'admin_backup' %}" class="btn btn-outline"
+                style="color: var(--primary); border-color: var(--primary); font-size: 0.85rem; text-decoration: none;">
+                💾 Respaldo JSON
+            </a>
+            <form action="{% url 'limpiar_movimientos' %}" method="post"
+                onsubmit="return confirm('¿Estás seguro de que quieres borrar TODO el historial de movimientos? Esta acción no se puede deshacer.');"
+                style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline"
+                    style="color: var(--danger); border-color: var(--danger); font-size: 0.85rem;">
+                    ⚠️ Limpiar Historial
+                </button>
+            </form>
+        </div>
         {% endif %}
     </div>
     <div class="table-container">

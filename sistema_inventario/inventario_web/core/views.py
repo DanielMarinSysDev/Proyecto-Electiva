@@ -10,6 +10,8 @@ from .models import Producto, HistorialMovimiento, UserAudit, validar_positivo
 from .forms import ProductoForm, MovimientoForm
 from django.utils import timezone
 import csv
+from io import StringIO
+from django.core.management import call_command
 
 # --- DASHBOARD & HOME ---
 # --- DASHBOARD & HOME ---
@@ -326,6 +328,19 @@ def audit_logs(request):
     
     logs = UserAudit.objects.all().order_by('-timestamp')[:100] # Limit to 100 for perf
     return render(request, 'core/admin_audit.html', {'logs': logs})
+
+@login_required
+def admin_backup(request):
+    if not request.user.is_superuser:
+        messages.error(request, 'Acceso denegado.')
+        return redirect('dashboard')
+    
+    sysout = StringIO()
+    # Dump only 'core' app data to avoid huge auth/session dumps, or use no args for everything
+    call_command('dumpdata', 'core', stdout=sysout) 
+    response = HttpResponse(sysout.getvalue(), content_type='application/json')
+    response['Content-Disposition'] = f'attachment; filename="backup_inventario_{timezone.now().date()}.json"'
+    return response
 
 
 from django.contrib.auth.forms import SetPasswordForm
