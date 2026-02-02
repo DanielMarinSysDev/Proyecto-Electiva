@@ -20,7 +20,11 @@ def public_catalog(request):
     productos = Producto.objects.all().order_by('categoria', 'nombre')
     query = request.GET.get('q')
     if query:
-        productos = productos.filter(models.Q(nombre__icontains=query) | models.Q(categoria__icontains=query))
+        productos = productos.filter(
+            models.Q(nombre__icontains=query) | 
+            models.Q(categoria__icontains=query) |
+            models.Q(sku__icontains=query)
+        )
     return render(request, 'core/public_catalog.html', {'productos': productos})
 
 @login_required
@@ -199,6 +203,19 @@ def api_registrar_movimiento(request, pk):
         
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+@permission_required('core.delete_historialmovimiento', raise_exception=True)
+def limpiar_movimientos(request):
+    if not request.user.is_superuser:
+        messages.error(request, 'Solo administradores pueden realizar esta acción.')
+        return redirect('dashboard')
+        
+    if request.method == 'POST':
+        HistorialMovimiento.objects.all().delete()
+        messages.success(request, 'Historial de movimientos eliminado correctamente.')
+        
+    return redirect('dashboard')
 
 # --- REPORTS ---
 @login_required

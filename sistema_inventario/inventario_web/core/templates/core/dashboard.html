@@ -30,7 +30,19 @@
 </div>
 
 <div class="card" style="margin-top: 2rem;">
-    <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Movimientos Recientes</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem;">Movimientos Recientes</h3>
+        {% if user.is_superuser %}
+        <form action="{% url 'limpiar_movimientos' %}" method="post"
+            onsubmit="return confirm('¿Estás seguro de que quieres borrar TODO el historial de movimientos? Esta acción no se puede deshacer.');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline"
+                style="color: var(--danger); border-color: var(--danger); font-size: 0.85rem;">
+                ⚠️ Limpiar Historial
+            </button>
+        </form>
+        {% endif %}
+    </div>
     <div class="table-container">
         <table class="table">
             <thead>

@@ -60,8 +60,9 @@
                                 title="Mover Stock">🔄</button>
                             <a href="{% url 'editar_producto' p.pk %}" class="btn btn-outline"
                                 style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" title="Editar">✏️</a>
-                            <a href="{% url 'generar_qr' p.pk %}" target="_blank" class="btn btn-outline"
-                                style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" title="Ver QR">📱</a>
+                            <button type="button" onclick="openQRModal('{{ p.pk }}', '{{ p.nombre|escapejs }}')"
+                                class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;"
+                                title="Ver QR">📱</button>
                             <a href="{% url 'eliminar_producto' p.pk %}" class="btn btn-danger"
                                 style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" title="Eliminar">🗑️</a>
                         </div>
@@ -108,7 +109,28 @@
     </div>
 </div>
 
+<!-- QR Modal -->
+<div id="qrModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div
+        style="background: var(--surface); padding: 2rem; border-radius: var(--radius); width: 90%; max-width: 350px; box-shadow: var(--shadow); text-align: center;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Código QR</h2>
+        <p id="qrProductName" style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;"></p>
+
+        <div
+            style="background: white; padding: 1rem; border-radius: 0.5rem; display: inline-block; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+            <img id="qrImage" src="" alt="Cargando QR..." style="width: 200px; height: 200px; display: block;">
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <button type="button" onclick="closeQRModal()" class="btn btn-outline">Cerrar</button>
+            <a id="qrDownloadLink" href="#" download="qr_code.png" class="btn btn-primary">Descargar</a>
+        </div>
+    </div>
+</div>
+
 <script>
+    // Movement Modal Logic
     function openModal(id, name) {
         document.getElementById('movementModal').style.display = 'flex';
         document.getElementById('modalProductId').value = id;
@@ -168,11 +190,32 @@
         }
     });
 
-    // Close modal when clicking outside
-    document.getElementById('movementModal').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('movementModal')) {
-            closeModal();
-        }
+    // QR Modal Logic
+    function openQRModal(id, name) {
+        const modal = document.getElementById('qrModal');
+        const img = document.getElementById('qrImage');
+        const nameEl = document.getElementById('qrProductName');
+        const link = document.getElementById('qrDownloadLink');
+
+        nameEl.textContent = name;
+        const qrUrl = `/productos/qr/${id}/`;
+        img.src = qrUrl;
+        link.href = qrUrl;
+        link.download = `QR_${name.replace(/\s+/g, '_')}.png`; // Suggest filename
+
+        modal.style.display = 'flex';
+    }
+
+    function closeQRModal() {
+        document.getElementById('qrModal').style.display = 'none';
+    }
+
+    // Close modals when clicking outside
+    window.addEventListener('click', (e) => {
+        const mm = document.getElementById('movementModal');
+        const qm = document.getElementById('qrModal');
+        if (e.target === mm) closeModal();
+        if (e.target === qm) closeQRModal();
     });
 </script>
 {% endblock %}
