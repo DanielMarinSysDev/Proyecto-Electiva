@@ -113,6 +113,12 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
+# Session Security Configuration
+# Auto-logout after 30 minutes (1800 seconds) of inactivity
+SESSION_COOKIE_AGE = 1800
+SESSION_SAVE_EVERY_REQUEST = True  # Resets the timer on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True # Optional: Close session on browser close
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
