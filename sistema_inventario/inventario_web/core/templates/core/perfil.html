@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto; margin-top: 2rem;">
+    <h1 style="border-bottom: 2px solid var(--border); padding-bottom: 1rem; margin-bottom: 2rem;">Mi Perfil</h1>
+
+    <div style="margin-bottom: 2rem;">
+        <p><strong>Usuario:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email|default:"No registrado" }}</p>
+        <p><strong>Rol:</strong> {% if user.is_superuser %}Administrador{% else %}Staff{% endif %}</p>
+    </div>
+
+    <div style="background: var(--background); padding: 1.5rem; border-radius: var(--radius);">
+        <h3 style="margin-bottom: 1rem;">Cambiar Contraseña</h3>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <small style="display: block; color: var(--text-muted); margin-top: 0.25rem;">{{ field.help_text
+                    }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                <small style="color: var(--danger);">{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Actualizar
+                Contraseña</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

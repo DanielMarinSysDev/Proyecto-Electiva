@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">🔐 Auditoría de Usuarios (Logs)</h1>
+</div>
+
+<div class="card">
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>FECHA</th>
+                    <th>ADMIN / ACTOR</th>
+                    <th>ACCIÓN</th>
+                    <th>USUARIO AFECTADO</th>
+                    <th>DETALLES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td style="white-space: nowrap; color: var(--text-muted);">{{ log.timestamp|date:"d/m/Y H:i:s" }}
+                    </td>
+                    <td style="font-weight: 600;">{{ log.admin }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if log.action == 'CREATE' %}badge-success
+                            {% elif log.action == 'UPDATE' %}badge-warning
+                            {% elif log.action == 'DELETE' %}badge-danger{% endif %}">
+                            {{ log.action }}
+                        </span>
+                    </td>
+                    <td>{{ log.target_user }}</td>
+                    <td style="font-size: 0.85rem; color: var(--text-muted); max-width: 300px; white-space: normal;">
+                        {{ log.details }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 2rem;">No hay registros de auditoría.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
