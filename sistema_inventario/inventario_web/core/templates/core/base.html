@@ -343,10 +343,83 @@
 
 <body>
     <nav class="sidebar">
-        <!-- ... (existing sidebar content) ... -->
+        <div class="brand">
+            Inv<span>System</span>
+        </div>
+
+        <div style="margin-bottom: 2rem; padding: 1rem; background: var(--background); border-radius: 0.5rem;">
+            <div style="font-weight: 600; font-size: 0.9rem;">{{ user.username }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                {% if user.is_superuser %}Administrador{% else %}Usuario{% endif %}
+            </div>
+        </div>
+
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a href="{% url 'dashboard' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <span>📊</span> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'lista_productos' %}"
+                    class="nav-link {% if 'productos' in request.path %}active{% endif %}">
+                    <span>📦</span> Productos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'reportes' %}" class="nav-link {% if 'reportes' in request.path %}active{% endif %}">
+                    <span>📑</span> Reportes
+                </a>
+            </li>
+            {% if user.is_superuser %}
+            <li class="nav-item">
+                <a href="{% url 'lista_usuarios' %}"
+                    class="nav-link {% if 'usuarios' in request.path %}active{% endif %}">
+                    <span>👥</span> Usuarios
+                </a>
+            </li>
+            {% endif %}
+            <li class="nav-item" style="margin-top: auto;">
+                <a href="{% url 'public_catalog' %}" class="nav-link" target="_blank">
+                    <span>🛍️</span> Ver Catálogo
+                </a>
+            </li>
+        </ul>
+
+        <div style="margin-top: auto;">
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="nav-link"
+                    style="width: 100%; border: none; background: none; cursor: pointer; color: var(--danger);">
+                    <span>🚪</span> Cerrar Sesión
+                </button>
+            </form>
+        </div>
     </nav>
+
     <main class="main-content">
-        <!-- ... (existing main content) ... -->
+        <header class="header">
+            <div class="page-title">
+                {% block page_title %}{% endblock %}
+            </div>
+            <div class="user-menu">
+                <button onclick="toggleTheme()" class="btn btn-outline">
+                    <span id="theme-icon">🌙</span> <span id="theme-text">Modo Oscuro</span>
+                </button>
+            </div>
+        </header>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
     </main>
     {% block extra_js %}{% endblock %}
 
