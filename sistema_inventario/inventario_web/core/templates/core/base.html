@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -13,7 +14,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/img/favicon-16x16.png' %}">
     <link rel="manifest" href="{% static 'core/img/site.webmanifest' %}">
 
-    <title>{% block title %}Sistema de Inventario{% endblock %}</title>
+    <title>{% block title %}{% trans "Sistema de Inventario" %}{% endblock %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -350,22 +351,22 @@
         <div style="margin-bottom: 2rem; padding: 1rem; background: var(--background); border-radius: 0.5rem;">
             <div style="font-weight: 600; font-size: 0.9rem;">{{ user.username }}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">
-                {% if user.is_superuser %}Administrador{% else %}Usuario{% endif %}
+                {% if user.is_superuser %}{% trans "Administrador" %}{% else %}{% trans "Usuario" %}{% endif %}
             </div>
             <a href="{% url 'perfil_usuario' %}"
                 style="font-size: 0.8rem; text-decoration: none; color: var(--primary);">
-                ⚙️ Mi Perfil
+                ⚙️ {% trans "Mi Perfil" %}
             </a>
             {% if user.is_superuser %}
             <br>
             <a href="{% url 'audit_logs' %}"
                 style="font-size: 0.8rem; text-decoration: none; color: var(--text-muted); display: inline-block; margin-top: 0.25rem;">
-                🔐 Auditoría
+                🔐 {% trans "Auditoría" %}
             </a>
             <br>
             <a href="{% url 'exportar_excel' %}"
                 style="font-size: 0.8rem; text-decoration: none; color: var(--success); display: inline-block; margin-top: 0.25rem;">
-                📈 Backup Excel
+                📈 {% trans "Backup Excel" %}
             </a>
             {% endif %}
         </div>
@@ -374,31 +375,31 @@
             <li class="nav-item">
                 <a href="{% url 'dashboard' %}"
                     class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                    <span>📊</span> Dashboard
+                    <span>📊</span> {% trans "Dashboard" %}
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{% url 'lista_productos' %}"
                     class="nav-link {% if 'productos' in request.path %}active{% endif %}">
-                    <span>📦</span> Productos
+                    <span>📦</span> {% trans "Productos" %}
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{% url 'reportes' %}" class="nav-link {% if 'reportes' in request.path %}active{% endif %}">
-                    <span>📑</span> Reportes
+                    <span>📑</span> {% trans "Reportes" %}
                 </a>
             </li>
             {% if user.is_superuser %}
             <li class="nav-item">
                 <a href="{% url 'lista_usuarios' %}"
                     class="nav-link {% if 'usuarios' in request.path %}active{% endif %}">
-                    <span>👥</span> Usuarios
+                    <span>👥</span> {% trans "Usuarios" %}
                 </a>
             </li>
             {% endif %}
             <li class="nav-item" style="margin-top: auto;">
                 <a href="{% url 'public_catalog' %}" class="nav-link" target="_blank">
-                    <span>🛍️</span> Ver Catálogo
+                    <span>🛍️</span> {% trans "Ver Catálogo" %}
                 </a>
             </li>
         </ul>
@@ -408,7 +409,7 @@
                 {% csrf_token %}
                 <button type="submit" class="nav-link"
                     style="width: 100%; border: none; background: none; cursor: pointer; color: var(--danger);">
-                    <span>🚪</span> Cerrar Sesión
+                    <span>🚪</span> {% trans "Cerrar Sesión" %}
                 </button>
             </form>
         </div>
@@ -430,7 +431,7 @@
                         {% get_available_languages as LANGUAGES %}
                         {% get_language_info_list for LANGUAGES as languages %}
                         {% for language in languages %}
-                        <option value="{{ language.code }}" {% if language.code==LANGUAGE_CODE %} selected{% endif %}>
+                        <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %} selected{% endif %}>
                             {{ language.name_local }} ({{ language.code }})
                         </option>
                         {% endfor %}
@@ -438,7 +439,7 @@
                 </form>
 
                 <button onclick="toggleTheme()" class="btn btn-outline">
-                    <span id="theme-icon">🌙</span> <span id="theme-text">Modo Oscuro</span>
+                    <span id="theme-icon">🌙</span> <span id="theme-text">{% trans "Modo Oscuro" %}</span>
                 </button>
             </div>
         </header>
