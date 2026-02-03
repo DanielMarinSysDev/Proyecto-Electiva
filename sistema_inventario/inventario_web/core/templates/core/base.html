@@ -431,7 +431,7 @@
                         {% get_available_languages as LANGUAGES %}
                         {% get_language_info_list for LANGUAGES as languages %}
                         {% for language in languages %}
-                        <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %} selected{% endif %}>
+                        <option value="{{ language.code }}" {% if language.code==LANGUAGE_CODE %} selected{% endif %}>
                             {{ language.name_local }} ({{ language.code }})
                         </option>
                         {% endfor %}
@@ -471,7 +471,7 @@
             const text = document.getElementById('theme-text');
             if (icon && text) {
                 icon.textContent = isDark ? '☀️' : '🌙';
-                text.textContent = isDark ? 'Modo Claro' : 'Modo Oscuro';
+                text.textContent = isDark ? '{% trans "Modo Claro" %}' : '{% trans "Modo Oscuro" %}';
             }
         }
 
@@ -519,7 +519,7 @@
             <!-- Header -->
             <div
                 style="padding: 1rem; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin: 0; font-size: 1rem;">Asistente InvSystem</h3>
+                <h3 style="margin: 0; font-size: 1rem;">{% trans "Asistente InvSystem" %}</h3>
                 <button onclick="toggleChat()"
                     style="background: none; border: none; color: white; cursor: pointer; font-size: 1.25rem;">&times;</button>
             </div>
@@ -529,13 +529,13 @@
                 style="flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem;">
                 <div
                     style="align-self: flex-start; background: var(--background); padding: 0.75rem; border-radius: 0.75rem 0.75rem 0.75rem 0; max-width: 80%; border: 1px solid var(--border);">
-                    Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy sobre el inventario?
+                    {% trans "Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy sobre el inventario?" %}
                 </div>
             </div>
 
             <!-- Input Area -->
             <div style="padding: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem;">
-                <input type="text" id="chat-input" placeholder="Escribe tu consulta..."
+                <input type="text" id="chat-input" placeholder="{% trans " Escribe tu consulta..." %}"
                     style="flex: 1; padding: 0.5rem; border: 1px solid var(--border); border-radius: 0.5rem; outline: none;">
                 <button onclick="sendMessage()"
                     style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">➤</button>
@@ -572,7 +572,7 @@
             // Loading
             const loadingDiv = document.createElement('div');
             loadingDiv.style.cssText = "align-self: flex-start; background: var(--background); padding: 0.75rem; border-radius: 0.75rem 0.75rem 0.75rem 0; max-width: 80%; border: 1px solid var(--border); color: var(--text-muted);";
-            loadingDiv.textContent = "Escribiendo...";
+            loadingDiv.textContent = "{% trans 'Escribiendo...' %}";
             messages.appendChild(loadingDiv);
 
             try {

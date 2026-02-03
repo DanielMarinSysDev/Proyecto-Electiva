@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -84,11 +85,11 @@ def crear_producto(request):
                 tipo='CREACION',
                 cantidad=producto.cantidad
             )
-            messages.success(request, f'Producto "{producto.nombre}" creado correctamente.')
+            messages.success(request, _('Producto "%(nombre)s" creado correctamente.') % {'nombre': producto.nombre})
             return redirect('lista_productos')
     else:
         form = ProductoForm()
-    return render(request, 'core/form_producto.html', {'form': form, 'titulo': 'Nuevo Producto'})
+    return render(request, 'core/form_producto.html', {'form': form, 'titulo': _('Nuevo Producto')})
 
 @login_required
 @login_required
@@ -105,11 +106,11 @@ def editar_producto(request, pk):
                 tipo='EDICION',
                 cantidad=0 # No changed stock, just details
             )
-            messages.success(request, f'Producto "{producto.nombre}" actualizado correctamente.')
+            messages.success(request, _('Producto "%(nombre)s" actualizado correctamente.') % {'nombre': producto.nombre})
             return redirect('lista_productos')
     else:
         form = ProductoForm(instance=producto)
-    return render(request, 'core/form_producto.html', {'form': form, 'titulo': f'Editar {producto.nombre}'})
+    return render(request, 'core/form_producto.html', {'form': form, 'titulo': _('Editar %(nombre)s') % {'nombre': producto.nombre}})
 
 @login_required
 @permission_required('core.delete_producto', raise_exception=True)
@@ -124,7 +125,7 @@ def eliminar_producto(request, pk):
         )
         nombre = producto.nombre
         producto.delete()
-        messages.success(request, f'Producto "{nombre}" eliminado correctamente.')
+        messages.success(request, _('Producto "%(nombre)s" eliminado correctamente.') % {'nombre': nombre})
         return redirect('lista_productos')
     return render(request, 'core/confirmar_eliminar.html', {'producto': producto})
 
@@ -144,13 +145,13 @@ def registrar_movimiento(request, pk):
             
             if tipo == 'ENTRADA':
                 producto.cantidad += cantidad
-                messages.success(request, f'Entrada de {cantidad} unidades registrada.')
+                messages.success(request, _('Entrada de %(cantidad)s unidades registrada.') % {'cantidad': cantidad})
             elif tipo == 'SALIDA':
                 if producto.cantidad >= cantidad:
                     producto.cantidad -= cantidad
-                    messages.success(request, f'Salida de {cantidad} unidades registrada.')
+                    messages.success(request, _('Salida de %(cantidad)s unidades registrada.') % {'cantidad': cantidad})
                 else:
-                    form.add_error('cantidad', 'No hay suficiente stock.')
+                    form.add_error('cantidad', _('No hay suficiente stock.'))
                     return render(request, 'core/form_movimiento.html', {'form': form, 'producto': producto})
             
             producto.save()
@@ -174,7 +175,7 @@ def api_registrar_movimiento(request, pk):
         cantidad = int(data.get('cantidad', 0))
         
         if cantidad <= 0:
-            return JsonResponse({'success': False, 'error': 'La cantidad debe ser mayor a 0.'})
+            return JsonResponse({'success': False, 'error': _('La cantidad debe ser mayor a 0.')})
 
         if tipo == 'ENTRADA':
             producto.cantidad += cantidad
@@ -184,9 +185,9 @@ def api_registrar_movimiento(request, pk):
                 producto.cantidad -= cantidad
                 action_msg = f'Salida de {cantidad}'
             else:
-                return JsonResponse({'success': False, 'error': 'Stock insuficiente.'})
+                return JsonResponse({'success': False, 'error': _('Stock insuficiente.')})
         else:
-            return JsonResponse({'success': False, 'error': 'Tipo de movimiento inválido.'})
+            return JsonResponse({'success': False, 'error': _('Tipo de movimiento inválido.')})
 
         producto.save()
         
@@ -610,7 +611,7 @@ def api_chat(request):
         full_prompt = f"{context_block}\n\nPregunta del Usuario ({user_role}): {user_message}"
         
         response = client.models.generate_content(
-            model='gemini-1.5-flash', 
+            model='gemini-3-flash-preview', 
             contents=full_prompt
         )
         

@@ -3,7 +3,7 @@
 {% block content %}
 <div class="header">
     <h1 class="page-title">{{ titulo }}</h1>
-    <a href="{% url 'lista_productos' %}" class="btn btn-outline">Cancelar</a>
+    <a href="{% url 'lista_productos' %}" class="btn btn-outline">{% trans "Cancelar" %}</a>
 </div>
 
 <div class="card" style="max-width: 600px; margin: 0 auto;">
@@ -12,7 +12,7 @@
 
         {% if form.errors %}
         <div class="alert alert-error">
-            <strong>Error:</strong> Por favor corrige los errores abajo.
+            <strong>{% trans "Error" %}:</strong> {% trans "Por favor corrige los errores abajo." %}
         </div>
         {% endif %}
 
@@ -27,7 +27,7 @@
         {% endfor %}
 
         <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
-            <button type="submit" class="btn btn-primary">Guardar Producto</button>
+            <button type="submit" class="btn btn-primary">{% trans "Guardar Producto" %}</button>
         </div>
     </form>
 </div>

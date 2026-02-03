@@ -74,3 +74,96 @@ msgstr "STOCK"
 
 msgid "ACCIONES"
 msgstr "ACTIONS"
+
+msgid "Modo Claro"
+msgstr "Light Mode"
+
+msgid "Asistente InvSystem"
+msgstr "InvSystem Assistant"
+
+msgid "Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy sobre el inventario?"
+msgstr "Hello, I am your virtual assistant. How can I help you with the inventory today?"
+
+msgid "Escribiendo..."
+msgstr "Typing..."
+
+msgid "Escribe tu consulta..."
+msgstr "Type your query..."
+
+msgid "Movimientos Recientes"
+msgstr "Recent Movements"
+
+msgid "Respaldo JSON"
+msgstr "JSON Backup"
+
+msgid "Limpiar Historial"
+msgstr "Clear History"
+
+msgid "FECHA"
+msgstr "DATE"
+
+msgid "TIPO"
+msgstr "TYPE"
+
+msgid "PRODUCTO"
+msgstr "PRODUCT"
+
+msgid "CANTIDAD"
+msgstr "QUANTITY"
+
+msgid "No hay movimientos recientes."
+msgstr "No recent movements."
+
+msgid "Valor del Inventario"
+msgstr "Inventory Value"
+
+msgid "Bajo Stock"
+msgstr "Low Stock"
+
+msgid "Cancelar"
+msgstr "Cancel"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Por favor corrige los errores abajo."
+msgstr "Please correct the errors below."
+
+msgid "Guardar Producto"
+msgstr "Save Product"
+
+msgid "Crear Producto"
+msgstr "Create Product"
+
+msgid "Editar Producto"
+msgstr "Edit Product"
+
+msgid "Producto \"%(nombre)s\" creado correctamente."
+msgstr "Product \"%(nombre)s\" created successfully."
+
+msgid "Producto \"%(nombre)s\" actualizado correctamente."
+msgstr "Product \"%(nombre)s\" updated successfully."
+
+msgid "Producto \"%(nombre)s\" eliminado correctamente."
+msgstr "Product \"%(nombre)s\" deleted successfully."
+
+msgid "Editar %(nombre)s"
+msgstr "Edit %(nombre)s"
+
+msgid "Entrada de %(cantidad)s unidades registrada."
+msgstr "Entry of %(cantidad)s units registered."
+
+msgid "Salida de %(cantidad)s unidades registrada."
+msgstr "Exit of %(cantidad)s units registered."
+
+msgid "No hay suficiente stock."
+msgstr "Not enough stock."
+
+msgid "La cantidad debe ser mayor a 0."
+msgstr "Amount must be greater than 0."
+
+msgid "Stock insuficiente."
+msgstr "Insufficient stock."
+
+msgid "Tipo de movimiento inválido."
+msgstr "Invalid movement type."

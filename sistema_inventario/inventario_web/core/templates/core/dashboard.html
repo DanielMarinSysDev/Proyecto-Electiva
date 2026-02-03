@@ -4,25 +4,25 @@
 <div class="header">
     <h1 class="page-title">Dashboard</h1>
     <a href="{% url 'crear_producto' %}" class="btn btn-primary">
-        <span>+</span> Nuevo Producto
+        <span>+</span> {% trans "Nuevo Producto" %}
     </a>
 </div>
 
 <div class="grid grid-3">
     <!-- Stats Cards -->
     <div class="card stat-card">
-        <span class="stat-label">Total Productos</span>
+        <span class="stat-label">{% trans "Total Productos" %}</span>
         <span class="stat-value">{{ total_productos }}</span>
     </div>
 
     <div class="card stat-card">
-        <span class="stat-label">Valor del Inventario</span>
+        <span class="stat-label">{% trans "Valor del Inventario" %}</span>
         <span class="stat-value">${{ valor_inventario|floatformat:2 }}</span>
     </div>
 
     <div
         class="card stat-card {% if productos_bajo_stock > 0 %}border-left-danger{% else %}border-left-success{% endif %}">
-        <span class="stat-label">Bajo Stock</span>
+        <span class="stat-label">{% trans "Bajo Stock" %}</span>
         <span class="stat-value {% if productos_bajo_stock > 0 %}text-danger{% else %}text-success{% endif %}">
             {{ productos_bajo_stock }}
         </span>
@@ -31,12 +31,12 @@
 
 <div class="card" style="margin-top: 2rem;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <h3 style="font-size: 1.25rem;">Movimientos Recientes</h3>
+        <h3 style="font-size: 1.25rem;">{% trans "Movimientos Recientes" %}</h3>
         {% if user.is_superuser %}
         <div style="display: flex; gap: 0.5rem; align-items: center;">
             <a href="{% url 'admin_backup' %}" class="btn btn-outline"
                 style="color: var(--primary); border-color: var(--primary); font-size: 0.85rem; text-decoration: none;">
-                💾 Respaldo JSON
+                💾 {% trans "Respaldo JSON" %}
             </a>
             <form action="{% url 'limpiar_movimientos' %}" method="post"
                 onsubmit="return confirm('¿Estás seguro de que quieres borrar TODO el historial de movimientos? Esta acción no se puede deshacer.');"
@@ -44,7 +44,7 @@
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline"
                     style="color: var(--danger); border-color: var(--danger); font-size: 0.85rem;">
-                    ⚠️ Limpiar Historial
+                    ⚠️ {% trans "Limpiar Historial" %}
                 </button>
             </form>
         </div>
@@ -54,11 +54,11 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>FECHA</th>
-                    <th>TIPO</th>
-                    <th>PRODUCTO</th>
-                    <th>CANTIDAD</th>
-                    <th>USUARIO</th>
+                    <th>{% trans "FECHA" %}</th>
+                    <th>{% trans "TIPO" %}</th>
+                    <th>{% trans "PRODUCTO" %}</th>
+                    <th>{% trans "CANTIDAD" %}</th>
+                    <th>{% trans "USUARIO" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,7 +77,8 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" style="text-align: center; color: var(--text-muted);">No hay movimientos recientes.
+                    <td colspan="5" style="text-align: center; color: var(--text-muted);">{% trans "No hay movimientos
+                        recientes." %}
                     </td>
                 </tr>
                 {% endfor %}
