@@ -611,7 +611,7 @@ def api_chat(request):
         full_prompt = f"{context_block}\n\nPregunta del Usuario ({user_role}): {user_message}"
         
         response = client.models.generate_content(
-            model='gemini-3-flash-preview', 
+            model='gemini-2.5-flash', 
             contents=full_prompt
         )
         
