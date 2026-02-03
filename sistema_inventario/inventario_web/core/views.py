@@ -605,7 +605,7 @@ def api_chat(request):
         """
 
         # 6. Generate Response
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         chat = model.start_chat(history=[])
         
         # Send context hidden from user, then user message
