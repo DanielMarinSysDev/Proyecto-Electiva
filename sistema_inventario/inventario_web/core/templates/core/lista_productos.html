@@ -1,11 +1,13 @@
 {% extends 'core/base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div class="header">
     <div>
-        <h1 class="page-title">Inventario</h1>
+        <h1 class="page-title">{% trans "Inventario" %}</h1>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">
-            Valor Total: <span id="total-inventory-value" style="font-weight: 700; color: var(--text-main);">
+            {% trans "Valor Total" %}: <span id="total-inventory-value"
+                style="font-weight: 700; color: var(--text-main);">
                 ${{ valor_inventario|floatformat:2 }}
             </span>
         </p>
@@ -21,7 +23,7 @@
                 title="Limpiar búsqueda">✕</a>
             {% endif %}
         </form>
-        <a href="{% url 'crear_producto' %}" class="btn btn-primary">Nuevo Producto</a>
+        <a href="{% url 'crear_producto' %}" class="btn btn-primary">{% trans "Nuevo Producto" %}</a>
     </div>
 </div>
 
@@ -31,11 +33,11 @@
             <thead>
                 <tr>
                     <th>SKU</th>
-                    <th>NOMBRE</th>
-                    <th>CATEGORÍA</th>
-                    <th>PRECIO</th>
-                    <th>STOCK</th>
-                    <th>ACCIONES</th>
+                    <th>{% trans "NOMBRE" %}</th>
+                    <th>{% trans "CATEGORÍA" %}</th>
+                    <th>{% trans "PRECIO" %}</th>
+                    <th>{% trans "STOCK" %}</th>
+                    <th>{% trans "ACCIONES" %}</th>
                 </tr>
             </thead>
             <tbody>

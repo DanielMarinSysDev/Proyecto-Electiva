@@ -1,0 +1,76 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: InvSystem\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-03 12:00+0000\n"
+"PO-Revision-Date: 2026-02-03 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Sistema de Inventario"
+msgstr "Inventory System"
+
+msgid "Administrador"
+msgstr "Administrator"
+
+msgid "Usuario"
+msgstr "User"
+
+msgid "Mi Perfil"
+msgstr "My Profile"
+
+msgid "Auditoría"
+msgstr "Audit Log"
+
+msgid "Backup Excel"
+msgstr "Backup Excel"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Productos"
+msgstr "Products"
+
+msgid "Reportes"
+msgstr "Reports"
+
+msgid "Usuarios"
+msgstr "Users"
+
+msgid "Ver Catálogo"
+msgstr "View Catalog"
+
+msgid "Cerrar Sesión"
+msgstr "Logout"
+
+msgid "Modo Oscuro"
+msgstr "Dark Mode"
+
+msgid "Inventario"
+msgstr "Inventory"
+
+msgid "Valor Total"
+msgstr "Total Value"
+
+msgid "Nuevo Producto"
+msgstr "New Product"
+
+msgid "NOMBRE"
+msgstr "NAME"
+
+msgid "CATEGORÍA"
+msgstr "CATEGORY"
+
+msgid "PRECIO"
+msgstr "PRICE"
+
+msgid "STOCK"
+msgstr "STOCK"
+
+msgid "ACCIONES"
+msgstr "ACTIONS"
