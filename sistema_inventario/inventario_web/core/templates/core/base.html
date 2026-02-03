@@ -362,6 +362,11 @@
                 style="font-size: 0.8rem; text-decoration: none; color: var(--text-muted); display: inline-block; margin-top: 0.25rem;">
                 🔐 Auditoría
             </a>
+            <br>
+            <a href="{% url 'exportar_excel' %}"
+                style="font-size: 0.8rem; text-decoration: none; color: var(--success); display: inline-block; margin-top: 0.25rem;">
+                📈 Backup Excel
+            </a>
             {% endif %}
         </div>
 
@@ -415,6 +420,23 @@
                 {% block page_title %}{% endblock %}
             </div>
             <div class="user-menu">
+                <form action="{% url 'set_language' %}" method="post"
+                    style="display: flex; gap: 0.5rem; align-items: center; margin-right: 1rem;">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ redirect_to }}">
+                    <select name="language" onchange="this.form.submit()" class="form-select"
+                        style="padding: 0.4rem; font-size: 0.9rem; width: auto;">
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% get_available_languages as LANGUAGES %}
+                        {% get_language_info_list for LANGUAGES as languages %}
+                        {% for language in languages %}
+                        <option value="{{ language.code }}" {% if language.code==LANGUAGE_CODE %} selected{% endif %}>
+                            {{ language.name_local }} ({{ language.code }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+
                 <button onclick="toggleTheme()" class="btn btn-outline">
                     <span id="theme-icon">🌙</span> <span id="theme-text">Modo Oscuro</span>
                 </button>
@@ -458,6 +480,132 @@
             document.body.classList.add('dark-theme');
             updateThemeIcon(true);
         }
+    </script>
+    <!-- AI Assistant Widget -->
+    <div id="ai-chat-widget" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 1000;">
+        <!-- Chat Button -->
+        <button onclick="toggleChat()" style="
+            width: 3.5rem; height: 3.5rem; 
+            border-radius: 50%; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: transform 0.2s;">
+            🤖
+        </button>
+
+        <!-- Chat Window -->
+        <div id="chat-window" style="
+            display: none; 
+            position: absolute; 
+            bottom: 4.5rem; 
+            right: 0; 
+            width: 350px; 
+            height: 500px; 
+            background: var(--surface); 
+            border: 1px solid var(--border); 
+            border-radius: 1rem; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+            flex-direction: column;
+            overflow: hidden;">
+
+            <!-- Header -->
+            <div
+                style="padding: 1rem; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 1rem;">Asistente InvSystem</h3>
+                <button onclick="toggleChat()"
+                    style="background: none; border: none; color: white; cursor: pointer; font-size: 1.25rem;">&times;</button>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="chat-messages"
+                style="flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem;">
+                <div
+                    style="align-self: flex-start; background: var(--background); padding: 0.75rem; border-radius: 0.75rem 0.75rem 0.75rem 0; max-width: 80%; border: 1px solid var(--border);">
+                    Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy sobre el inventario?
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div style="padding: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem;">
+                <input type="text" id="chat-input" placeholder="Escribe tu consulta..."
+                    style="flex: 1; padding: 0.5rem; border: 1px solid var(--border); border-radius: 0.5rem; outline: none;">
+                <button onclick="sendMessage()"
+                    style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const window = document.getElementById('chat-window');
+            if (window.style.display === 'none') {
+                window.style.display = 'flex';
+            } else {
+                window.style.display = 'none';
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const messages = document.getElementById('chat-messages');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            // User Message
+            const userDiv = document.createElement('div');
+            userDiv.style.cssText = "align-self: flex-end; background: var(--primary); color: white; padding: 0.75rem; border-radius: 0.75rem 0.75rem 0 0.75rem; max-width: 80%;";
+            userDiv.textContent = text;
+            messages.appendChild(userDiv);
+
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+
+            // Loading
+            const loadingDiv = document.createElement('div');
+            loadingDiv.style.cssText = "align-self: flex-start; background: var(--background); padding: 0.75rem; border-radius: 0.75rem 0.75rem 0.75rem 0; max-width: 80%; border: 1px solid var(--border); color: var(--text-muted);";
+            loadingDiv.textContent = "Escribiendo...";
+            messages.appendChild(loadingDiv);
+
+            try {
+                const response = await fetch('/api/chat/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ message: text })
+                });
+
+                const data = await response.json();
+
+                messages.removeChild(loadingDiv);
+
+                const botDiv = document.createElement('div');
+                botDiv.style.cssText = "align-self: flex-start; background: var(--background); padding: 0.75rem; border-radius: 0.75rem 0.75rem 0.75rem 0; max-width: 80%; border: 1px solid var(--border);";
+                botDiv.textContent = data.response || "Error: " + data.error;
+                messages.appendChild(botDiv);
+
+                messages.scrollTop = messages.scrollHeight;
+
+            } catch (error) {
+                messages.removeChild(loadingDiv);
+                console.error("Error sending message:", error);
+            }
+        }
+
+        document.getElementById('chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
     </script>
 </body>
 

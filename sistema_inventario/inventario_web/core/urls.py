@@ -1,8 +1,9 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
+    path('i18n/', include('django.conf.urls.i18n')),
     path('', views.home, name='home'),
     path('catalogo/', views.public_catalog, name='public_catalog'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -13,6 +14,7 @@ urlpatterns = [
     path('productos/movimiento/<int:pk>/', views.registrar_movimiento, name='registrar_movimiento'),
     path('productos/qr/<int:pk>/', views.generar_qr, name='generar_qr'),
     path('api/movimiento/<int:pk>/', views.api_registrar_movimiento, name='api_registrar_movimiento'),
+    path('api/chat/', views.api_chat, name='api_chat'),
     path('movimientos/limpiar/', views.limpiar_movimientos, name='limpiar_movimientos'),
     path('reportes/', views.reportes, name='reportes'),
     path('reportes/exportar/', views.exportar_reporte, name='exportar_reporte'),
@@ -27,6 +29,7 @@ urlpatterns = [
     path('perfil/', views.perfil_usuario, name='perfil_usuario'), # Self-service profile
     path('seguridad/auditoria/', views.audit_logs, name='audit_logs'), # Audit Log - Changed to avoid admin/ conflict
     path('seguridad/respaldo/', views.admin_backup, name='admin_backup'), # JSON Backup
+    path('seguridad/respaldo/excel/', views.exportar_excel, name='exportar_excel'), # Excel Backup
     
     # Auth Views
     path('login/', auth_views.LoginView.as_view(template_name='core/login.html'), name='login'),

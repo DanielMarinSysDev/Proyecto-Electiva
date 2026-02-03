@@ -342,6 +342,81 @@ def admin_backup(request):
     response['Content-Disposition'] = f'attachment; filename="backup_inventario_{timezone.now().date()}.json"'
     return response
 
+@login_required
+def exportar_excel(request):
+    if not request.user.is_superuser:
+        messages.error(request, 'Acceso denegado.')
+        return redirect('dashboard')
+        
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="backup_inventario_{timezone.now().date()}.xlsx"'
+
+    wb = openpyxl.Workbook()
+    
+    # 1. Hojas de Productos
+    ws_productos = wb.active
+    ws_productos.title = "Productos"
+    
+    headers = ['ID', 'SKU', 'Nombre', 'Categoría', 'Precio', 'Cantidad', 'Fecha Creación']
+    for col_num, header in enumerate(headers, 1):
+        cell = ws_productos.cell(row=1, column=col_num)
+        cell.value = header
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill(start_color="4F46E5", end_color="4F46E5", fill_type="solid")
+        
+    for row_num, producto in enumerate(Producto.objects.all(), 2):
+        ws_productos.cell(row=row_num, column=1, value=producto.id)
+        ws_productos.cell(row=row_num, column=2, value=producto.sku)
+        ws_productos.cell(row=row_num, column=3, value=producto.nombre)
+        ws_productos.cell(row=row_num, column=4, value=producto.categoria)
+        ws_productos.cell(row=row_num, column=5, value=float(producto.precio))
+        ws_productos.cell(row=row_num, column=6, value=producto.cantidad)
+        ws_productos.cell(row=row_num, column=7, value=str(producto.fecha_creacion))
+
+    # 2. Hoja de Usuarios
+    ws_usuarios = wb.create_sheet(title="Usuarios")
+    headers_users = ['ID', 'Username', 'Email', 'Nombre', 'Apellido', 'Es Staff', 'Es Superuser', 'Fecha Registro']
+    
+    for col_num, header in enumerate(headers_users, 1):
+        cell = ws_usuarios.cell(row=1, column=col_num)
+        cell.value = header
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill(start_color="4F46E5", end_color="4F46E5", fill_type="solid")
+
+    for row_num, user in enumerate(User.objects.all(), 2):
+        ws_usuarios.cell(row=row_num, column=1, value=user.id)
+        ws_usuarios.cell(row=row_num, column=2, value=user.username)
+        ws_usuarios.cell(row=row_num, column=3, value=user.email)
+        ws_usuarios.cell(row=row_num, column=4, value=user.first_name)
+        ws_usuarios.cell(row=row_num, column=5, value=user.last_name)
+        ws_usuarios.cell(row=row_num, column=6, value=user.is_staff)
+        ws_usuarios.cell(row=row_num, column=7, value=user.is_superuser)
+        ws_usuarios.cell(row=row_num, column=8, value=str(user.date_joined))
+
+    # 3. Hoja de Movimientos
+    ws_movimientos = wb.create_sheet(title="Movimientos")
+    headers_mov = ['ID', 'Producto', 'Tipo', 'Cantidad', 'Usuario', 'Fecha']
+    
+    for col_num, header in enumerate(headers_mov, 1):
+        cell = ws_movimientos.cell(row=1, column=col_num)
+        cell.value = header
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill(start_color="4F46E5", end_color="4F46E5", fill_type="solid")
+
+    for row_num, mov in enumerate(HistorialMovimiento.objects.select_related('producto', 'usuario').all(), 2):
+        ws_movimientos.cell(row=row_num, column=1, value=mov.id)
+        ws_movimientos.cell(row=row_num, column=2, value=mov.producto.nombre if mov.producto else 'Borrado')
+        ws_movimientos.cell(row=row_num, column=3, value=mov.tipo)
+        ws_movimientos.cell(row=row_num, column=4, value=mov.cantidad)
+        ws_movimientos.cell(row=row_num, column=5, value=mov.usuario.username if mov.usuario else 'Desconocido')
+        ws_movimientos.cell(row=row_num, column=6, value=str(mov.fecha))
+
+    wb.save(response)
+    return response
+
 
 from django.contrib.auth.forms import SetPasswordForm
 
@@ -444,3 +519,46 @@ def generar_qr(request, pk):
     buffer.seek(0)
     
     return HttpResponse(buffer, content_type='image/png')
+
+# --- AI ASSISTANT ---
+import google.generativeai as genai
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+
+@login_required
+@require_POST
+def api_chat(request):
+    try:
+        data = json.loads(request.body)
+        user_message = data.get('message', '')
+        
+        if not user_message:
+            return JsonResponse({'success': False, 'error': 'Mensaje vacío'})
+
+        # Configure Gemini
+        # TODO: Move to settings/env in production
+        genai.configure(api_key="AIzaSyALiLHXowYO0ijRWvWQxZ6cYik9uvlUjHA")
+        
+        # Build Context
+        total_productos = Producto.objects.aggregate(total=Sum('cantidad'))['total'] or 0
+        bajos_stock = Producto.objects.filter(cantidad__lt=5).count()
+        
+        # Use simple context to avoid complex queries for now
+        context_info = f"""
+        Eres un asistente útil para el Sistema de Inventario 'InvSystem'.
+        Información actual del sistema:
+        - Total de productos en stock: {total_productos}
+        - Productos con bajo stock (<5): {bajos_stock}
+        
+        Responde preguntas sobre el sistema o ayuda general. Sé conciso y amable.
+        """
+        
+        model = genai.GenerativeModel('gemini-pro')
+        chat = model.start_chat(history=[])
+        
+        response = chat.send_message(f"{context_info}\n\nUsuario: {user_message}")
+        
+        return JsonResponse({'success': True, 'response': response.text})
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
