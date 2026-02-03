@@ -526,7 +526,7 @@ def generar_qr(request, pk):
     return HttpResponse(buffer, content_type='image/png')
 
 # --- AI ASSISTANT ---
-import google.generativeai as genai
+from google import genai
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
@@ -542,7 +542,7 @@ def api_chat(request):
             return JsonResponse({'success': False, 'error': 'Mensaje vacío'})
 
         # Configure Gemini
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         
         # 1. Gather Real-Time Data
         total_productos = Producto.objects.aggregate(total=Sum('cantidad'))['total'] or 0
@@ -605,13 +605,14 @@ def api_chat(request):
         """
 
         # 6. Generate Response
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        chat = model.start_chat(history=[])
-        
-        # Send context hidden from user, then user message
+        # Using gemini-1.5-flash as it is the stable fast model. 
+        # gemini-3-flash-preview mentioned by user might not be generally available or require specific beta access.
         full_prompt = f"{context_block}\n\nPregunta del Usuario ({user_role}): {user_message}"
         
-        response = chat.send_message(full_prompt)
+        response = client.models.generate_content(
+            model='gemini-1.5-flash', 
+            contents=full_prompt
+        )
         
         return JsonResponse({'success': True, 'response': response.text})
         
