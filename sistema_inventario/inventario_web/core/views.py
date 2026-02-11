@@ -585,7 +585,23 @@ def api_chat(request):
             NOTA: NO tienes acceso a gestión de usuarios, auditoría ni backups. Si preguntan, indica que contacten al Admin.
             """
 
-        # 5. Build the Final Context Block
+        # 5. Retrieve and Update Chat History
+        chat_history = request.session.get('chat_history', [])
+        
+        # Append current user message
+        chat_history.append({"role": "user", "content": user_message})
+        
+        # Keep only the last 10 messages to manage context window
+        if len(chat_history) > 10:
+            chat_history = chat_history[-10:]
+
+        # Format history for the prompt
+        history_text = ""
+        for msg in chat_history[:-1]: # Exclude the last one as it's added below
+            role_label = "Usuario" if msg['role'] == 'user' else "InvBot"
+            history_text += f"{role_label}: {msg['content']}\n"
+
+        # 6. Build the Final Context Block
         context_block = f"""
         {system_prompt}
 
@@ -603,9 +619,12 @@ def api_chat(request):
         - Inventario -> Nuevo: Crear producto.
         - Reportes: Ver alertas de stock.
         - Admin Panel: (Solo si el usuario es Admin).
+        
+        HISTORIAL DE CONVERSACIÓN RECIENTE:
+        {history_text}
         """
 
-        # 6. Generate Response
+        # 7. Generate Response
         # Using gemini-1.5-flash as it is the stable fast model. 
         # gemini-3-flash-preview mentioned by user might not be generally available or require specific beta access.
         full_prompt = f"{context_block}\n\nPregunta del Usuario ({user_role}): {user_message}"
@@ -615,7 +634,15 @@ def api_chat(request):
             contents=full_prompt
         )
         
-        return JsonResponse({'success': True, 'response': response.text})
+        bot_response = response.text
+        
+        # Append bot response to history
+        chat_history.append({"role": "assistant", "content": bot_response})
+        
+        # Save back to session
+        request.session['chat_history'] = chat_history
+        
+        return JsonResponse({'success': True, 'response': bot_response})
         
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
