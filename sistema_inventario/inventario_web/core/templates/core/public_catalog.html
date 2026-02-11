@@ -29,12 +29,12 @@
             --warning: #eab308;
             --border: #e2e8f0;
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             --radius: 0.75rem;
         }
 
-        .dark-theme {
-            --background: radial-gradient(circle, rgb(10, 25, 47) 0%, rgb(2, 12, 27) 100%);
+        html.dark-theme {
+            --background: #0f172a;
+            /* Solid dark color fallback/base */
             --surface: #1e293b;
             --text-main: #f8fafc;
             --text-muted: #cbd5e1;
@@ -42,17 +42,28 @@
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.3);
         }
 
-        .dark-theme .card,
-        .dark-theme .search-input,
-        .dark-theme .navbar {
+        /* Apply gradient to body in dark mode if desired, or simplified solid */
+        html.dark-theme body {
+            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+            background-attachment: fixed;
+        }
+
+        /* Specific overrides for Dark Mode */
+        html.dark-theme .navbar,
+        html.dark-theme .card,
+        html.dark-theme .search-input {
             background-color: var(--surface);
             border-color: var(--border);
             color: var(--text-main);
         }
 
-        .dark-theme .brand {
+        html.dark-theme .brand {
             color: #38bdf8;
-            /* Sky-400 equivalent for dark mode */
+            /* Sky-400 */
+        }
+
+        html.dark-theme .search-input::placeholder {
+            color: var(--text-muted);
         }
 
         body {
@@ -62,6 +73,7 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .navbar {
@@ -74,6 +86,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
         .brand {
@@ -110,6 +123,8 @@
             font-size: 1rem;
             box-shadow: var(--shadow);
             transition: all 0.2s;
+            color: var(--text-main);
+            /* Ensure text color inherits */
         }
 
         .search-input:focus {
@@ -129,7 +144,7 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             overflow: hidden;
-            transition: transform 0.2s;
+            transition: transform 0.2s, background-color 0.3s ease, border-color 0.3s ease;
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
@@ -276,10 +291,11 @@
     </div>
 
     <script>
+        // Use document.documentElement (html tag) instead of body for robust styling
         function toggleTheme() {
-            const body = document.body;
-            body.classList.toggle('dark-theme');
-            const isDark = body.classList.contains('dark-theme');
+            const html = document.documentElement;
+            html.classList.toggle('dark-theme');
+            const isDark = html.classList.contains('dark-theme');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             updateThemeIcon(isDark);
         }
@@ -289,9 +305,10 @@
             if (icon) { icon.textContent = isDark ? '☀️' : '🌙'; }
         }
 
+        // Initialize theme
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
-            document.body.classList.add('dark-theme');
+            document.documentElement.classList.add('dark-theme');
             updateThemeIcon(true);
         }
     </script>

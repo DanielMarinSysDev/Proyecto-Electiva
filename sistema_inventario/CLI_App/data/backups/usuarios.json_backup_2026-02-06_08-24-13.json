@@ -8,7 +8,7 @@
     {
         "id": 2,
         "username": "Daniel",
-        "password": "AAA",
+        "password": "123",
         "rol": "user"
     }
 ]
