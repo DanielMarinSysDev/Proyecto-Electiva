@@ -15,7 +15,7 @@ from django.core.management import call_command
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'inventario_web.settings')
 
 # Vercel Hack: Run migrations on startup to ensure SQLite is up to date
-# This is necessary because the build step modification to db.sqlite3 might not persist to the lambda environment
+# This is necessary because the build step modification to db.sqlite3 might not persist to the lambda environment 
 try:
     print("Running migrations on startup...")
     call_command('migrate')
