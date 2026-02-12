@@ -625,7 +625,6 @@ def api_chat(request):
         """
 
         # 7. Generate Response
-        # Using gemini-1.5-flash as it is the stable fast model. 
         # gemini-3-flash-preview mentioned by user might not be generally available or require specific beta access.
         full_prompt = f"{context_block}\n\nPregunta del Usuario ({user_role}): {user_message}"
         
