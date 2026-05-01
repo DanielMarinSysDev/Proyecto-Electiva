@@ -403,6 +403,11 @@
                     <span>🛍️</span> {% trans "Ver Catálogo" %}
                 </a>
             </li>
+            <li class="nav-item" id="contenedor-instalar" style="display: none;">
+                <a href="#" id="btnInstalar" class="nav-link" style="cursor: pointer;">
+                    <span>📱</span> {% trans "Instalar App" %}
+                </a>
+            </li>
         </ul>
 
         <div style="margin-top: auto;">
@@ -609,6 +614,57 @@
             }
         });
     </script>
+    <script>
+        // 1. Registro del Service Worker (lo que ya tenías)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register("{% url 'sw' %}")
+                    .then(registration => console.log('SW registrado con éxito'))
+                    .catch(error => console.log('Error al registrar el SW:', error));
+            });
+        }
+
+        // 2. Lógica para el botón de instalación
+        let eventoInstalacionDiferida;
+        const botonInstalar = document.getElementById('btnInstalar');
+
+        // El navegador detecta que es instalable y dispara este evento
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Previene que aparezca el mini-aviso predeterminado del celular
+            e.preventDefault();
+            // Guarda el evento para usarlo cuando el usuario haga clic
+            eventoInstalacionDiferida = e;
+            // Muestra nuestro botón personalizado
+            botonInstalar.style.display = 'block'; 
+        });
+
+        // Qué pasa cuando hacen clic en nuestro botón
+        botonInstalar.addEventListener('click', async () => {
+            if (eventoInstalacionDiferida !== null) {
+                // Muestra el cuadro de diálogo de instalación nativo del sistema
+                eventoInstalacionDiferida.prompt();
+      
+                // Espera a ver qué responde el usuario
+                const { outcome } = await eventoInstalacionDiferida.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('El usuario aceptó la instalación');
+                } else {
+                    console.log('El usuario rechazó la instalación');
+                }
+      
+                // Ya no necesitamos el evento guardado
+                eventoInstalacionDiferida = null;
+                // Ocultamos el botón nuevamente
+                botonInstalar.style.display = 'none';
+            }
+        });
+
+        // Ocultar el botón si la app ya fue instalada
+        window.addEventListener('appinstalled', () => {
+            botonInstalar.style.display = 'none';
+            console.log('La PWA fue instalada con éxito');
+        });
+</script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
