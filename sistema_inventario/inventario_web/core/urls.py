@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
@@ -19,6 +20,9 @@ urlpatterns = [
     path('reportes/', views.reportes, name='reportes'),
     path('reportes/exportar/', views.exportar_reporte, name='exportar_reporte'),
     path('reportes/pdf/', views.exportar_pdf, name='exportar_pdf'),
+    path('manifest.json', TemplateView.as_view(template_name='core/manifest.json', content_type='application/json'), name='manifest'),
+    path('sw.js', TemplateView.as_view(template_name='core/sw.js', content_type='application/javascript'), name='sw'),
+
     
     # User Management
     path('usuarios/', views.lista_usuarios, name='lista_usuarios'),
