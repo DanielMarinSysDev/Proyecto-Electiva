@@ -624,7 +624,7 @@ def api_chat(request):
         {history_text}
         """
 
-        # 7. Generate Response
+        # 7. Genera respuesta
         # gemini-3-flash-preview mentioned by user might not be generally available or require specific beta access.
         full_prompt = f"{context_block}\n\nPregunta del Usuario ({user_role}): {user_message}"
         
